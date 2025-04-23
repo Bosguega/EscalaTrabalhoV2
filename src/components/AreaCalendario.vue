@@ -9,45 +9,58 @@
     </div>
 
     <!-- Dias do mês -->
-    <div class="grid grid-cols-7 text-center gap-1">
-      <div
-        v-for="(dia, index) in diasDoMes"
-        :key="index"
-        class="aspect-square flex items-center justify-center text-sm rounded transition duration-200 relative cursor-pointer"
-        :style="{
-          backgroundColor: dia.ativo
-            ? isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
-              ? props.cores.trabalho
-              : isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
-                ? props.cores.folga
-                : 'transparent'
-            : 'transparent',
-          color: dia.ativo
-            ? (isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala) || isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
-              ? 'white' : '#4b5563')
-            : '#9ca3af'
-        }"
-        @click="abrirModalAnotacoes(dia)"
-      >
-        {{ dia.numero }}
+    <transition
+  :enter-active-class="selectedAnimation.enter"
+  :leave-active-class="selectedAnimation.leave"
+  mode="out-in"
+>
+  <div
+    :key="mes"
+    class="grid grid-cols-7 text-center gap-1 w-full"
+  >
+    <div
+      v-for="(dia, index) in diasDoMes"
+      :key="`${mes}-${index}`"
+      class="aspect-square flex items-center justify-center text-sm rounded relative cursor-pointer"
+      :class="[`animate__delay-${Math.min(index % 7, 5)}0ms`]"
+      :style="{
+        backgroundColor: dia.ativo
+          ? isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
+            ? props.cores.trabalho
+            : isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
+              ? props.cores.folga
+              : 'transparent'
+          : 'transparent',
+        color: dia.ativo
+          ? (isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala) || isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
+            ? 'white' : '#4b5563')
+          : '#9ca3af'
+      }"
+      @click="abrirModalAnotacoes(dia)"
+    >
+      {{ dia.numero }}
 
-        <!-- Indicador de anotação -->
-        <div
-          v-if="dia.ativo && dia.numero && temAnotacao(ano, mes, Number(dia.numero))"
-          class="absolute top-0 right-0 w-0 h-0 border-t-[18px] border-l-[18px] border-t-yellow-400 border-l-transparent shadow-md rounded-tr-sm"
-        ></div>
-      </div>
+      <!-- Indicador de anotação -->
+      <div
+        v-if="dia.ativo && dia.numero && temAnotacao(ano, mes, Number(dia.numero))"
+        class="absolute top-0 right-0 w-0 h-0 border-t-[18px] border-l-[18px] border-t-yellow-400 border-l-transparent shadow-md rounded-tr-sm"
+      ></div>
+    </div>
+  </div>
+</transition>
+
     </div>
 
     <!-- Modal de Anotações -->
     <Anotacoes v-model="modalAnotacoesAberto" :data="dataSelecionada" @anotacao-salva="atualizarAnotacoes" />
-  </div>
+  
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { isTrabalho, isFolga, gerarDiasDoMes } from '../utils/escala'
 import { verificarAnotacao, abrirModalAnotacoes as abrirModal, atualizarAnotacoes as atualizarDias } from '../utils/anotacoes'
+import { selectedAnimation, loadAnimationPreference } from '../utils/animations'
 import Anotacoes from './Anotacoes.vue'
 
 // Props
@@ -124,6 +137,9 @@ function proximo() {
 
 // Swipe logic
 onMounted(() => {
+  // Carregar preferência de animação
+  loadAnimationPreference()
+  
   const el = calendario.value
   if (!el) return
 
@@ -153,4 +169,5 @@ onMounted(() => {
     e.preventDefault()
   }, { passive: false })
 })
+
 </script>

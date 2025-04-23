@@ -12,8 +12,19 @@
         </svg>
       </button>
   
-      <!-- Texto do mês -->
-      <span class="text-lg font-medium text-gray-800 dark:text-gray-200">{{ nomeMes }} {{ ano }}</span>
+      <!-- Texto do mês com animação -->
+      <transition
+        :enter-active-class="selectedAnimation.enter"
+        :leave-active-class="selectedAnimation.leave"
+        mode="out-in"
+      >
+        <span 
+          :key="`${nomeMes}-${ano}`" 
+          class="text-lg font-medium text-gray-800 dark:text-gray-200"
+        >
+          {{ nomeMes }} {{ ano }}
+        </span>
+      </transition>
   
       <!-- Botão próximo -->
       <button
@@ -30,7 +41,8 @@
   </template>
   
   <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
+  import { selectedAnimation, loadAnimationPreference } from '../utils/animations'
   
   const props = defineProps<{ data: Date }>()
   const emit = defineEmits<{
@@ -53,5 +65,10 @@
     novaData.setMonth(novaData.getMonth() + 1)
     emit('update:data', novaData)
   }
+  
+  // Carregar preferência de animação ao montar o componente
+  onMounted(() => {
+    loadAnimationPreference()
+  })
   </script>
   

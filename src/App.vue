@@ -1,10 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
-    <Cabecalho />
+    <Cabecalho @toggle-sidebar="toggleMenuLateral" />
     <BotoesAcao :cores="cores" :escala="escalaAtual" :data-inicial="dataInicialEscala" @atualizar-escala="atualizarEscala" @atualizar-data-inicial="atualizarDataInicial" />
     <NavegacaoMes v-model:data="dataAtual" />
     <AreaCalendario v-model:data="dataAtual" :cores="cores" :escala="escalaAtual" :data-inicial="dataInicialEscala" />
     <LegendaComSeletor @atualizar-cores="atualizarCores" />
+    <MenuLateral :aberto="menuLateralAberto" @fechar="fecharMenuLateral" />
   </div>
 </template>
 
@@ -15,8 +16,12 @@ import BotoesAcao from './components/BotoesAcao.vue'
 import NavegacaoMes from './components/NavegacaoMes.vue'
 import AreaCalendario from './components/AreaCalendario.vue'
 import LegendaComSeletor from './components/LegendaComSeletor.vue'
+import MenuLateral from './components/MenuLateral.vue'
 import { loadThemePreference, getCurrentTheme } from './utils/theme'
 import { carregarConfiguracao } from './utils/escala'
+
+// Estado do menu lateral
+const menuLateralAberto = ref(false)
 
 const dataAtual = ref(new Date())
 const escalaAtual = ref('2x2')
@@ -66,6 +71,15 @@ function atualizarEscala(novaEscala: string) {
 
 function atualizarDataInicial(novaData: Date) {
   dataInicialEscala.value = novaData
+}
+
+// Funções para controlar o menu lateral
+function toggleMenuLateral() {
+  menuLateralAberto.value = !menuLateralAberto.value
+}
+
+function fecharMenuLateral() {
+  menuLateralAberto.value = false
 }
 </script>
 
