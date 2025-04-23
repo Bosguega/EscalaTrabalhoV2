@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { gerarDiasDoMes, isTrabalho, isFolga } from '../utils/escala'
-import { verificarAnotacao } from '../utils/anotacoes'
+import { verificarAnotacao, abrirModalAnotacoes as abrirModal, atualizarAnotacoes as atualizarDias } from '../utils/anotacoes'
 import Anotacoes from './Anotacoes.vue'
 
 const props = defineProps<{
@@ -109,14 +109,13 @@ function temAnotacao(ano: number, mes: number, dia: number): boolean {
 
 // Abrir modal de anotações ao clicar em um dia
 function abrirModalAnotacoes(mes: number, dia: number) {
-  dataSelecionada.value = new Date(anoSelecionado.value, mes, dia)
-  modalAnotacoesAberto.value = true
+  abrirModal(dataSelecionada, modalAnotacoesAberto, anoSelecionado.value, mes, dia)
 }
 
 // Atualizar quando uma anotação for salva
 function atualizarAnotacoes() {
   // Forçar atualização do componente
-  meses.value = [...meses.value]
+  atualizarDias(meses)
 }
 
 // Garantir que dataInicial seja um objeto Date válido

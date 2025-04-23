@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { isDark } from '../utils/theme'
-import { formatarDataChave } from '../utils/anotacoes'
+import { formatarDataChave, formatarData as formatarDataUtil, carregarAnotacao as carregarAnotacaoUtil, salvarAnotacao as salvarAnotacaoUtil } from '../utils/anotacoes'
 
 const props = defineProps<{
   modelValue: boolean
@@ -67,8 +67,7 @@ const STORAGE_KEY = 'anotacoes_calendario'
 
 // Formatar a data para exibição no título
 function formatarData(data: Date): string {
-  if (!data) return ''
-  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return formatarDataUtil(data)
 }
 
 // Carregar anotação existente quando o modal abrir
@@ -80,26 +79,14 @@ watch(() => props.modelValue, (novoValor) => {
 
 // Carregar anotação do localStorage
 function carregarAnotacao() {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY)
-  if (anotacoesSalvas) {
-    const anotacoes = JSON.parse(anotacoesSalvas)
-    const dataFormatada = formatarDataChave(props.data)
-    anotacaoLocal.value = anotacoes[dataFormatada] || ''
-  } else {
-    anotacaoLocal.value = ''
-  }
+  anotacaoLocal.value = carregarAnotacaoUtil(props.data)
 }
 
 // Salvar anotação no localStorage
 function salvarAnotacao() {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY)
-  const anotacoes = anotacoesSalvas ? JSON.parse(anotacoesSalvas) : {}
-  
-  const dataFormatada = formatarDataChave(props.data)
-  anotacoes[dataFormatada] = anotacaoLocal.value
-  
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(anotacoes))
-  emit('anotacao-salva', { data: props.data, texto: anotacaoLocal.value })
-  emit('update:modelValue', false)
+  salvarAnotacaoUtil(props.data, anotacaoLocal.value, (data, texto) => {
+    emit('anotacao-salva', { data, texto })
+    emit('update:modelValue', false)
+  })
 }
 </script>

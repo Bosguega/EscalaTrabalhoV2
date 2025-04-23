@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { isTrabalho, isFolga, gerarDiasDoMes } from '../utils/escala'
-import { verificarAnotacao } from '../utils/anotacoes'
+import { verificarAnotacao, abrirModalAnotacoes as abrirModal, atualizarAnotacoes as atualizarDias } from '../utils/anotacoes'
 import Anotacoes from './Anotacoes.vue'
 
 // Props
@@ -68,12 +68,11 @@ const dataSelecionada = ref(new Date())
 
 function abrirModalAnotacoes(dia: { numero: number | string, ativo: boolean }) {
   if (!dia.ativo || !dia.numero) return
-  dataSelecionada.value = new Date(ano.value, mes.value, Number(dia.numero))
-  modalAnotacoesAberto.value = true
+  abrirModal(dataSelecionada, modalAnotacoesAberto, ano.value, mes.value, dia.numero)
 }
 
 function atualizarAnotacoes() {
-  diasDoMes.value = [...diasDoMes.value] // Força update
+  atualizarDias(diasDoMes)
 }
 
 function temAnotacao(ano: number, mes: number, dia: number): boolean {
