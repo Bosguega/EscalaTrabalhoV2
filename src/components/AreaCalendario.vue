@@ -16,14 +16,14 @@
         class="aspect-square flex items-center justify-center text-sm rounded transition duration-200 relative cursor-pointer"
         :style="{
           backgroundColor: dia.ativo
-            ? isTrabalho(ano, mes, dia.numero, props.dataInicial, props.escala)
+            ? isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
               ? props.cores.trabalho
-              : isFolga(ano, mes, dia.numero, props.dataInicial, props.escala)
+              : isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
                 ? props.cores.folga
                 : 'transparent'
             : 'transparent',
           color: dia.ativo
-            ? (isTrabalho(ano, mes, dia.numero, props.dataInicial, props.escala) || isFolga(ano, mes, dia.numero, props.dataInicial, props.escala)
+            ? (isTrabalho(ano, mes, Number(dia.numero), props.dataInicial, props.escala) || isFolga(ano, mes, Number(dia.numero), props.dataInicial, props.escala)
               ? 'white' : '#4b5563')
             : '#9ca3af'
         }"
@@ -33,7 +33,7 @@
 
         <!-- Indicador de anotação -->
         <div
-          v-if="dia.ativo && dia.numero && temAnotacao(ano, mes, dia.numero)"
+          v-if="dia.ativo && dia.numero && temAnotacao(ano, mes, Number(dia.numero))"
           class="absolute top-0 right-0 w-0 h-0 border-t-[18px] border-l-[18px] border-t-yellow-400 border-l-transparent shadow-md rounded-tr-sm"
         ></div>
       </div>
@@ -58,9 +58,9 @@ const props = defineProps<{
   dataInicial: Date
 }>()
 
-// Variáveis auxiliares
-const ano = props.data.getFullYear()
-const mes = props.data.getMonth()
+// Variáveis auxiliares como computed properties para atualizar automaticamente
+const ano = computed(() => props.data.getFullYear())
+const mes = computed(() => props.data.getMonth())
 
 // Modal de anotação
 const modalAnotacoesAberto = ref(false)
@@ -68,7 +68,7 @@ const dataSelecionada = ref(new Date())
 
 function abrirModalAnotacoes(dia: { numero: number | string, ativo: boolean }) {
   if (!dia.ativo || !dia.numero) return
-  dataSelecionada.value = new Date(ano, mes, Number(dia.numero))
+  dataSelecionada.value = new Date(ano.value, mes.value, Number(dia.numero))
   modalAnotacoesAberto.value = true
 }
 
@@ -81,7 +81,7 @@ function temAnotacao(ano: number, mes: number, dia: number): boolean {
   return verificarAnotacao(data)
 }
 
-const diasDoMes = ref([])
+const diasDoMes = ref<{ numero: number | string; ativo: boolean }[]>([])
 
 function atualizarDiasDoMes() {
   const { dias, diasAntes } = gerarDiasDoMes(props.data)
