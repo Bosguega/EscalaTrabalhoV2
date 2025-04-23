@@ -5,10 +5,7 @@
       <!-- Botão: Configurar Escala -->
       <button
         @click="abrirModal"
-        class="flex items-center gap-2 px-4 py-2 text-white rounded transition"
-        :style="{ backgroundColor: 'var(--color-primary)' }"
-        @mouseover="(e) => e.currentTarget.style.backgroundColor = 'var(--color-secondary)'"
-        @mouseleave="(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'"
+        class="flex items-center gap-2 px-4 py-2 text-white rounded transition bg-primary hover:bg-secondary dark:bg-primary dark:hover:bg-secondary"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -27,10 +24,7 @@
       <!-- Botão: Ano Completo -->
       <button
         @click="abrirAno"
-        class="flex items-center gap-2 px-4 py-2 text-white rounded transition"
-        :style="{ backgroundColor: 'var(--color-primary)' }"
-        @mouseover="(e) => e.currentTarget.style.backgroundColor = 'var(--color-secondary)'"
-        @mouseleave="(e) => e.currentTarget.style.backgroundColor = 'var(--color-primary)'"
+        class="flex items-center gap-2 px-4 py-2 text-white rounded transition bg-primary hover:bg-secondary dark:bg-primary dark:hover:bg-secondary"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

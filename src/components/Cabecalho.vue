@@ -5,8 +5,7 @@
         <!-- Botão de tema -->
         <button
           @click="toggleTheme"
-          class="p-2 rounded focus:outline-none focus:ring-2 focus:ring-white" 
-          :style="{ 'background-color': isDark ? 'transparent' : '', '&:hover': { backgroundColor: getCurrentTheme().primary } }"
+          class="p-2 rounded focus:outline-none focus:ring-2 focus:ring-white hover:bg-primary dark:hover:bg-primary dark:bg-transparent"
           aria-label="Alternar tema"
         >
           <!-- Ícone de sol/lua -->
@@ -20,8 +19,7 @@
         <!-- Botão de menu -->
         <button
           @click="toggleSidebar"
-          class="p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
-          :style="{ 'background-color': isDark ? 'transparent' : '', '&:hover': { backgroundColor: getCurrentTheme().primary } }"
+          class="p-2 rounded focus:outline-none focus:ring-2 focus:ring-white hover:bg-primary dark:hover:bg-primary dark:bg-transparent"
           aria-label="Menu"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
