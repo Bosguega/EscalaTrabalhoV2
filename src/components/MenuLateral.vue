@@ -29,47 +29,58 @@
           <!-- Conteúdo do menu com seletor de animações -->
           <div class="space-y-4">
             <div>
-              <!-- Título do submenu com setinha -->
+              <!-- Submenu de Animações -->
               <button 
-                @click="toggleSubmenu"
+                @click="toggleSubmenu('animacoes')"
                 class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
               >
                 <span class="font-semibold text-gray-800 dark:text-white">Seleção de Animações</span>
-                <svg xmlns="http://www.w3.org/2000/svg" :class="{'transform rotate-180': submenuAberto}" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" :class="{'transform rotate-180': submenus.animacoes}" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
-              <!-- Submenu de animações -->
-              <div v-show="submenuAberto" class="mt-2 pl-4">
+              <div v-show="submenus.animacoes" class="mt-2 pl-4">
                 <SeletordeAnimacoes />
+              </div>
+            </div>
+            <div>
+              <!-- Submenu de Backup -->
+              <button 
+                @click="toggleSubmenu('backup')"
+                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
+              >
+                <span class="font-semibold text-gray-800 dark:text-white">Backup</span>
+                <svg xmlns="http://www.w3.org/2000/svg" :class="{'transform rotate-180': submenus.backup}" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="submenus.backup" class="mt-2 pl-4">
+                <MenuBackup />
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </template>
+</template>
   
-  <script setup lang="ts">
-  import { ref } from 'vue'
-  import SeletordeAnimacoes from './SeletordeAnimacoes.vue'
-  
-  // Definir props e emits
-  defineProps<{ aberto: boolean }>()
-  const emit = defineEmits(['fechar'])
-  
-  // Remover a ref local 'aberto'
-  // const aberto = ref(false) // Controle do menu lateral - REMOVIDO
-  const submenuAberto = ref(false) // Controle do submenu
-  
-  // Remover a função local 'fecharMenu', usar emit diretamente
-  // function fecharMenu() {
-  //   aberto.value = false
-  // }
-  
-  function toggleSubmenu() {
-    submenuAberto.value = !submenuAberto.value
-  }
-  </script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import SeletordeAnimacoes from './SeletordeAnimacoes.vue'
+import MenuBackup from './MenuBackup.vue'
+
+// Definir props e emits
+defineProps<{ aberto: boolean }>()
+const emit = defineEmits(['fechar'])
+
+// Controle dos submenus
+const submenus = ref({
+  animacoes: false,
+  backup: false
+})
+
+function toggleSubmenu(menu: 'animacoes' | 'backup') {
+  submenus.value[menu] = !submenus.value[menu]
+}
+</script>
   

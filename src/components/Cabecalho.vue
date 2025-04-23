@@ -1,5 +1,5 @@
 <template>
-    <header class="flex items-center justify-between p-4 bg-primary text-white shadow-md dark:bg-gray-800">
+    <header class="flex items-center justify-between p-4 mb-4 bg-primary text-white shadow-md dark:bg-gray-800">
       <h1 class="text-lg font-semibold tracking-wide">Escala de Trabalho</h1>
       <div class="flex items-center gap-4">
         <!-- Botão de tema -->

@@ -71,20 +71,20 @@ function formatarData(data: Date): string {
 }
 
 // Carregar anotação existente quando o modal abrir
-watch(() => props.modelValue, (novoValor) => {
+watch(() => props.modelValue, async (novoValor) => {
   if (novoValor) {
-    carregarAnotacao()
+    await carregarAnotacao()
   }
 })
 
 // Carregar anotação do localStorage
-function carregarAnotacao() {
-  anotacaoLocal.value = carregarAnotacaoUtil(props.data)
+async function carregarAnotacao() {
+  anotacaoLocal.value = await carregarAnotacaoUtil(props.data)
 }
 
 // Salvar anotação no localStorage
-function salvarAnotacao() {
-  salvarAnotacaoUtil(props.data, anotacaoLocal.value, (data, texto) => {
+async function salvarAnotacao() {
+  await salvarAnotacaoUtil(props.data, anotacaoLocal.value, (data, texto) => {
     emit('anotacao-salva', { data, texto })
     emit('update:modelValue', false)
   })

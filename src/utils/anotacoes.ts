@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'anotacoes_calendario';
 
+import { carregarDados, salvarDados } from './useDadosApp';
+
 export function formatarDataChave(data: Date): string {
   if (!data) return '';
   const ano = data.getFullYear();
@@ -8,17 +10,17 @@ export function formatarDataChave(data: Date): string {
   return `${ano}-${mes}-${dia}`;
 }
 
-export function verificarAnotacao(data: Date): boolean {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY);
-  if (!anotacoesSalvas) return false;
-  const anotacoes = JSON.parse(anotacoesSalvas);
+export async function verificarAnotacao(data: Date): Promise<boolean> {
+  const dados = await carregarDados();
+  if (!dados.anotacoes) return false;
+  const anotacoes = JSON.parse(dados.anotacoes);
   const dataFormatada = formatarDataChave(data);
   return !!anotacoes[dataFormatada];
 }
 
-export function obterTodasAnotacoes(): Record<string, string> {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY);
-  return anotacoesSalvas ? JSON.parse(anotacoesSalvas) : {};
+export async function obterTodasAnotacoes(): Promise<Record<string, string>> {
+  const dados = await carregarDados();
+  return dados.anotacoes ? JSON.parse(dados.anotacoes) : {};
 }
 
 // Função para abrir o modal de anotações
@@ -47,10 +49,10 @@ export function formatarData(data: Date): string {
 }
 
 // Carregar anotação do localStorage
-export function carregarAnotacao(data: Date): string {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY);
-  if (anotacoesSalvas) {
-    const anotacoes = JSON.parse(anotacoesSalvas);
+export async function carregarAnotacao(data: Date): Promise<string> {
+  const dados = await carregarDados();
+  if (dados.anotacoes) {
+    const anotacoes = JSON.parse(dados.anotacoes);
     const dataFormatada = formatarDataChave(data);
     return anotacoes[dataFormatada] || '';
   }
@@ -58,18 +60,18 @@ export function carregarAnotacao(data: Date): string {
 }
 
 // Salvar anotação no localStorage
-export function salvarAnotacao(
+export async function salvarAnotacao(
   data: Date,
   texto: string,
   callback?: (data: Date, texto: string) => void
-): void {
-  const anotacoesSalvas = localStorage.getItem(STORAGE_KEY);
-  const anotacoes = anotacoesSalvas ? JSON.parse(anotacoesSalvas) : {};
+): Promise<void> {
+  const dados = await carregarDados();
+  const anotacoes = dados.anotacoes ? JSON.parse(dados.anotacoes) : {};
   
   const dataFormatada = formatarDataChave(data);
   anotacoes[dataFormatada] = texto;
   
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(anotacoes));
+  await salvarDados({ ...dados, anotacoes: JSON.stringify(anotacoes) });
   if (callback) {
     callback(data, texto);
   }

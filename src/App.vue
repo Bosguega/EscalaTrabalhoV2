@@ -18,7 +18,7 @@ import AreaCalendario from './components/AreaCalendario.vue'
 import LegendaComSeletor from './components/LegendaComSeletor.vue'
 import MenuLateral from './components/MenuLateral.vue'
 import { loadThemePreference, getCurrentTheme } from './utils/theme'
-import { carregarConfiguracao } from './utils/escala'
+import { carregarConfiguracao, salvarConfiguracao } from './utils/escala'
 
 // Estado do menu lateral
 const menuLateralAberto = ref(false)
@@ -32,45 +32,50 @@ const cores = ref({
   folga: getCurrentTheme().folga
 })
 
-onMounted(() => {
+onMounted(async () => {
   // Carrega as preferências de tema
   loadThemePreference()
   
-  // Carrega as configurações da escala do localStorage
-  const configuracao = carregarConfiguracao()
+  // Carrega as configurações da escala usando a função assíncrona
+  const configuracao = await carregarConfiguracao()
   escalaAtual.value = configuracao.escala
   dataInicialEscala.value = new Date(configuracao.dataInicial)
   
-  // Prioridade de carregamento das cores:
-  // 1. Cores individuais no localStorage (corTrabalho, corFolga)
-  // 2. Cores do objeto de configuração
-  // 3. Cores do tema atual
-  const corTrabalhoSalva = localStorage.getItem('corTrabalho')
-  const corFolgaSalva = localStorage.getItem('corFolga')
-  
-  if (corTrabalhoSalva) {
-    cores.value.trabalho = corTrabalhoSalva
-  } else if (configuracao.cores?.trabalho) {
+  // Atualiza as cores com base na configuração
+  if (configuracao.cores?.trabalho) {
     cores.value.trabalho = configuracao.cores.trabalho
   }
   
-  if (corFolgaSalva) {
-    cores.value.folga = corFolgaSalva
-  } else if (configuracao.cores?.folga) {
+  if (configuracao.cores?.folga) {
     cores.value.folga = configuracao.cores.folga
   }
 })
 
-function atualizarCores(novasCores: { trabalho: string; folga: string }) {
+async function atualizarCores(novasCores: { trabalho: string; folga: string }) {
   cores.value = novasCores
+  await salvarConfiguracao({
+    escala: escalaAtual.value,
+    dataInicial: dataInicialEscala.value.toISOString(),
+    cores: novasCores
+  })
 }
 
-function atualizarEscala(novaEscala: string) {
+async function atualizarEscala(novaEscala: string) {
   escalaAtual.value = novaEscala
+  await salvarConfiguracao({
+    escala: novaEscala,
+    dataInicial: dataInicialEscala.value.toISOString(),
+    cores: cores.value
+  })
 }
 
-function atualizarDataInicial(novaData: Date) {
+async function atualizarDataInicial(novaData: Date) {
   dataInicialEscala.value = novaData
+  await salvarConfiguracao({
+    escala: escalaAtual.value,
+    dataInicial: novaData.toISOString(),
+    cores: cores.value
+  })
 }
 
 // Funções para controlar o menu lateral

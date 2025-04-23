@@ -88,9 +88,9 @@ function atualizarAnotacoes() {
   atualizarDias(diasDoMes)
 }
 
-function temAnotacao(ano: number, mes: number, dia: number): boolean {
+async function temAnotacao(ano: number, mes: number, dia: number): Promise<boolean> {
   const data = new Date(ano, mes, dia)
-  return verificarAnotacao(data)
+  return await verificarAnotacao(data)
 }
 
 const diasDoMes = ref<{ numero: number | string; ativo: boolean }[]>([])

@@ -102,9 +102,9 @@ const modalAnotacoesAberto = ref(false)
 const dataSelecionada = ref(new Date())
 
 // Verificar se um dia tem anotação
-function temAnotacao(ano: number, mes: number, dia: number): boolean {
+async function temAnotacao(ano: number, mes: number, dia: number): Promise<boolean> {
   const data = new Date(ano, mes, dia)
-  return verificarAnotacao(data)
+  return await verificarAnotacao(data)
 }
 
 // Abrir modal de anotações ao clicar em um dia

@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 
+import { carregarDados, salvarDados } from './useDadosApp'
+
 interface ThemeColors {
   primary: string
   secondary: string
@@ -39,17 +41,17 @@ const themes: Theme = {
 // Estado do tema
 const isDark = ref(false)
 
-// Carregar preferência do usuário do localStorage
-const loadThemePreference = () => {
+// Carregar preferência do usuário do localforage
+const loadThemePreference = async () => {
     try {
-      const savedTheme = localStorage.getItem('theme')
-      if (savedTheme) {
-        isDark.value = savedTheme === 'dark'
+      const dados = await carregarDados()
+      if (dados.tema) {
+        isDark.value = dados.tema === 'dark'
       } else {
         isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
       }
     } catch (e) {
-      console.warn('⚠️ localStorage não disponível, usando tema padrão.')
+      console.warn('⚠️ Erro ao carregar tema, usando tema padrão.')
       isDark.value = false // ou true, se preferir começar no dark
     }
   
@@ -57,15 +59,16 @@ const loadThemePreference = () => {
   }
 
 // Aplicar tema ao documento
-const applyTheme = () => {
+const applyTheme = async () => {
   document.documentElement.classList.toggle('dark', isDark.value)
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  const dados = await carregarDados()
+  await salvarDados({ ...dados, tema: isDark.value ? 'dark' : 'light' })
 }
 
 // Alternar tema
-const toggleTheme = () => {
+const toggleTheme = async () => {
   isDark.value = !isDark.value
-  applyTheme()
+  await applyTheme()
 }
 
 // Obter cores do tema atual
