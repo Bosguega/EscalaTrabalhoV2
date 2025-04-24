@@ -152,9 +152,11 @@ const dataInicialObj = computed(() => {
 })
 
 // Observar mudanças no ano selecionado
-watch(anoSelecionado, async () => {
-  await carregarAnotacoesAno()
-}, { immediate: true })
+watch(() => props.modelValue, async (novoValor) => {
+  if (novoValor) {
+    await carregarAnotacoesAno();
+  }
+})
 
 // Gerar lista de anos disponíveis (5 anos para trás e 5 anos para frente)
 const anosDisponiveis = computed(() => {
