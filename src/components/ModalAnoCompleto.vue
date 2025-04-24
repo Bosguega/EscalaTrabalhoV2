@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { gerarDiasDoMes, isTrabalho, isFolga } from '../utils/escala'
 import { verificarAnotacao, abrirModalAnotacoes as abrirModal, atualizarAnotacoes as atualizarDias } from '../utils/anotacoes'
 import Anotacoes from './Anotacoes.vue'
@@ -97,14 +97,37 @@ const props = defineProps<{
 
 defineEmits(['update:modelValue'])
 
-// Estado para o modal de anotações
+// Estado para o modal de anotações e anotações dos dias
 const modalAnotacoesAberto = ref(false)
 const dataSelecionada = ref(new Date())
+const anotacoesDias = ref<Record<string, boolean>>({})
+
+// Formatar data para usar como chave
+function formatarDataChave(data: Date): string {
+  const ano = data.getFullYear()
+  const mes = (data.getMonth() + 1).toString().padStart(2, '0')
+  const dia = data.getDate().toString().padStart(2, '0')
+  return `${ano}-${mes}-${dia}`
+}
 
 // Verificar se um dia tem anotação
-async function temAnotacao(ano: number, mes: number, dia: number): Promise<boolean> {
+function temAnotacao(ano: number, mes: number, dia: number): boolean {
+  // O mês já está no formato correto (0-11) pois vem do array 'meses'
   const data = new Date(ano, mes, dia)
-  return await verificarAnotacao(data)
+  const chave = formatarDataChave(data)
+  return anotacoesDias.value[chave] || false
+}
+
+// Carregar anotações do ano selecionado
+async function carregarAnotacoesAno() {
+  for (let mes = 0; mes < 12; mes++) {
+    const ultimoDia = new Date(anoSelecionado.value, mes + 1, 0).getDate()
+    for (let dia = 1; dia <= ultimoDia; dia++) {
+      const data = new Date(anoSelecionado.value, mes, dia)
+      const chave = formatarDataChave(data)
+      anotacoesDias.value[chave] = await verificarAnotacao(data)
+    }
+  }
 }
 
 // Abrir modal de anotações ao clicar em um dia
@@ -113,18 +136,25 @@ function abrirModalAnotacoes(mes: number, dia: number) {
 }
 
 // Atualizar quando uma anotação for salva
-function atualizarAnotacoes() {
-  // Forçar atualização do componente
+async function atualizarAnotacoes() {
+  await carregarAnotacoesAno()
   atualizarDias(meses)
 }
+
+// Definir variáveis de ano primeiro
+const anoAtual = new Date().getFullYear()
+const anoSelecionado = ref(anoAtual)
 
 // Garantir que dataInicial seja um objeto Date válido
 const dataInicialObj = computed(() => {
   if (!props.dataInicial) return new Date()
   return new Date(props.dataInicial)
 })
-const anoAtual = new Date().getFullYear()
-const anoSelecionado = ref(anoAtual)
+
+// Observar mudanças no ano selecionado
+watch(anoSelecionado, async () => {
+  await carregarAnotacoesAno()
+}, { immediate: true })
 
 // Gerar lista de anos disponíveis (5 anos para trás e 5 anos para frente)
 const anosDisponiveis = computed(() => {

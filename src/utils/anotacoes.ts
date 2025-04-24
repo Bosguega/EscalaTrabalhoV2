@@ -15,7 +15,7 @@ export async function verificarAnotacao(data: Date): Promise<boolean> {
   if (!dados.anotacoes) return false;
   const anotacoes = JSON.parse(dados.anotacoes);
   const dataFormatada = formatarDataChave(data);
-  return !!anotacoes[dataFormatada];
+  return !!anotacoes[dataFormatada] && anotacoes[dataFormatada].trim() !== '';
 }
 
 export async function obterTodasAnotacoes(): Promise<Record<string, string>> {

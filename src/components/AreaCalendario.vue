@@ -1,6 +1,5 @@
 <template>
   <div
-    ref="calendario"
     class="w-full max-w-md mx-auto mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4"
   >
     <!-- Cabeçalho dos dias da semana -->
@@ -75,6 +74,16 @@ const props = defineProps<{
 const ano = computed(() => props.data.getFullYear())
 const mes = computed(() => props.data.getMonth())
 
+// Estado para armazenar as anotações
+const anotacoesDias = ref<Record<string, boolean>>({})
+
+function formatarDataChave(data: Date): string {
+  const ano = data.getFullYear()
+  const mes = (data.getMonth() + 1).toString().padStart(2, '0')
+  const dia = data.getDate().toString().padStart(2, '0')
+  return `${ano}-${mes}-${dia}`
+}
+
 // Modal de anotação
 const modalAnotacoesAberto = ref(false)
 const dataSelecionada = ref(new Date())
@@ -84,13 +93,15 @@ function abrirModalAnotacoes(dia: { numero: number | string, ativo: boolean }) {
   abrirModal(dataSelecionada, modalAnotacoesAberto, ano.value, mes.value, dia.numero)
 }
 
-function atualizarAnotacoes() {
+async function atualizarAnotacoes() {
   atualizarDias(diasDoMes)
+  await carregarAnotacoesMes()
 }
 
-async function temAnotacao(ano: number, mes: number, dia: number): Promise<boolean> {
+function temAnotacao(ano: number, mes: number, dia: number): boolean {
   const data = new Date(ano, mes, dia)
-  return await verificarAnotacao(data)
+  const chave = formatarDataChave(data)
+  return anotacoesDias.value[chave] || false
 }
 
 const diasDoMes = ref<{ numero: number | string; ativo: boolean }[]>([])
@@ -110,8 +121,20 @@ function atualizarDiasDoMes() {
   diasDoMes.value = diasFormatados
 }
 
-watch(() => props.data, () => {
+async function carregarAnotacoesMes() {
+  const primeiroDia = new Date(ano.value, mes.value, 1)
+  const ultimoDia = new Date(ano.value, mes.value + 1, 0)
+  
+  for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+    const data = new Date(ano.value, mes.value, dia)
+    const chave = formatarDataChave(data)
+    anotacoesDias.value[chave] = await verificarAnotacao(data)
+  }
+}
+
+watch(() => props.data, async () => {
   atualizarDiasDoMes()
+  await carregarAnotacoesMes()
 }, { immediate: true })
 
 // Refs e variáveis para swipe

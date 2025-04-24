@@ -8,7 +8,8 @@
           type="radio" 
           :id="`animation-${animation.id}`" 
           :value="animation.id" 
-          v-model="selectedAnimationId"
+          :checked="selectedAnimationId === animation.id"
+          @change="selectedAnimationId = animation.id"
           class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
         >
         <label 
