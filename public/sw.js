@@ -1,22 +1,26 @@
 // Service Worker para PWA Escala de Trabalho
 const CACHE_NAME = 'escala-trabalho-v1';
+
+// Determina o caminho base da aplicação
+const basePath = self.location.pathname.replace('sw.js', '');
+
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/src/main.ts',
-  '/src/App.vue',
-  '/src/assets/tailwind.css',
-  '/src/utils/anotacoes.ts',
-  '/src/utils/escala.ts',
-  '/src/utils/theme.ts',
-  '/icons/icon-72x72.png',
-  '/icons/icon-96x96.png',
-  '/icons/icon-128x128.png',
-  '/icons/icon-144x144.png',
-  '/icons/icon-152x152.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-384x384.png',
-  '/icons/icon-512x512.png'
+  basePath,
+  basePath + 'index.html',
+  basePath + 'src/main.ts',
+  basePath + 'src/App.vue',
+  basePath + 'src/assets/tailwind.css',
+  basePath + 'src/utils/anotacoes.ts',
+  basePath + 'src/utils/escala.ts',
+  basePath + 'src/utils/theme.ts',
+  basePath + 'icons/icon-72x72.png',
+  basePath + 'icons/icon-96x96.png',
+  basePath + 'icons/icon-128x128.png',
+  basePath + 'icons/icon-144x144.png',
+  basePath + 'icons/icon-152x152.png',
+  basePath + 'icons/icon-192x192.png',
+  basePath + 'icons/icon-384x384.png',
+  basePath + 'icons/icon-512x512.png'
 ];
 
 // Instalação e cache de recursos
