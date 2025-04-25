@@ -2,7 +2,7 @@
   "name": "Escala de Trabalho",
   "short_name": "Escala",
   "description": "Aplicativo de gerenciamento de escala de trabalho",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",

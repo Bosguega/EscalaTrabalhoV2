@@ -4,13 +4,17 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/EscalaTrabalhoV2/',
+  base: './',
   plugins: [
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.svg', 'icons/*.png'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.svg', 'icons/*.png', 'manifest.json'],
       strategies: 'generateSW',
+      injectRegister: 'auto',
+      devOptions: {
+        enabled: true
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
@@ -35,7 +39,7 @@ export default defineConfig({
         short_name: 'Escala',
         description: 'Aplicativo de gerenciamento de escala de trabalho',
         theme_color: '#3b82f6',
-        start_url: './index.html',
+        start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
         icons: [
