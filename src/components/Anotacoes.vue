@@ -1,11 +1,11 @@
 <template>
-  <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="rounded-lg p-6 max-w-md w-full" :class="isDark ? 'dark:bg-gray-800 dark:text-gray-200' : 'bg-white text-gray-800'">
       <!-- Cabeçalho -->
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Anotações - {{ formatarData(data) }}</h2>
+        <h2 class="text-2xl font-bold">Anotações - {{ noteStore.formatarData(noteStore.dataSelecionada!) }}</h2>
         <button
-          @click="$emit('update:modelValue', false)"
+          @click="fecharModal"
           class="p-2 hover:bg-opacity-20 rounded-full"
           :class="isDark ? 'dark:hover:bg-gray-700' : 'hover:bg-gray-100'"
           aria-label="Fechar modal"
@@ -33,7 +33,7 @@
         <!-- Botões -->
         <div class="flex justify-between gap-2 mt-6">
           <button
-            @click="$emit('update:modelValue', false)"
+            @click="fecharModal"
             class="px-4 py-2 text-white rounded transition w-full bg-blue-500 hover:bg-purple-500"
           >
             Cancelar
@@ -51,42 +51,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { isDark } from '../utils/theme'
-import { formatarDataChave, formatarData as formatarDataUtil, carregarAnotacao as carregarAnotacaoUtil, salvarAnotacao as salvarAnotacaoUtil } from '../utils/anotacoes'
+import { useNoteStore } from '../stores/note'
 
-const props = defineProps<{
-  modelValue: boolean
-  data: Date
-}>()
-
-const emit = defineEmits(['update:modelValue', 'anotacao-salva'])
-
+const noteStore = useNoteStore()
 const anotacaoLocal = ref('')
-const STORAGE_KEY = 'anotacoes_calendario'
-
-// Formatar a data para exibição no título
-function formatarData(data: Date): string {
-  return formatarDataUtil(data)
-}
 
 // Carregar anotação existente quando o modal abrir
-watch(() => props.modelValue, async (novoValor) => {
-  if (novoValor) {
-    await carregarAnotacao()
+watch(() => noteStore.modalAberto, async (novoValor) => {
+  if (novoValor && noteStore.dataSelecionada) {
+    anotacaoLocal.value = noteStore.carregarAnotacao(noteStore.dataSelecionada)
   }
 })
 
-// Carregar anotação do localStorage
-async function carregarAnotacao() {
-  anotacaoLocal.value = await carregarAnotacaoUtil(props.data)
+function fecharModal() {
+  noteStore.fecharModal()
 }
 
 // Salvar anotação no localStorage
 async function salvarAnotacao() {
-  await salvarAnotacaoUtil(props.data, anotacaoLocal.value, (data, texto) => {
-    emit('anotacao-salva', { data, texto })
-    emit('update:modelValue', false)
-  })
+  if (!noteStore.dataSelecionada) return
+  await noteStore.salvarAnotacao(noteStore.dataSelecionada, anotacaoLocal.value)
+  noteStore.fecharModal()
 }
 </script>

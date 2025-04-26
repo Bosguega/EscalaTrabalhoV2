@@ -10,7 +10,7 @@ export interface DadosApp {
 }
 
 // Valores padrão
-const dadosPadrao: DadosApp = {
+export const dadosPadrao: DadosApp = {
   versao: 2,
   escala: null,
   anotacoes: null,

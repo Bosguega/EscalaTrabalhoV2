@@ -45,13 +45,13 @@
               :key="dia"
               class="aspect-square flex items-center justify-center text-sm rounded transition duration-200 relative cursor-pointer"
               :style="{
-                backgroundColor: isTrabalho(anoSelecionado, mes.numero, dia, dataInicialObj, props.escala)
+                backgroundColor: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
                   ? props.cores.trabalho
-                  : isFolga(anoSelecionado, mes.numero, dia, dataInicialObj, props.escala)
+                  : scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
                     ? props.cores.folga
                     : 'transparent',
-                color: isTrabalho(anoSelecionado, mes.numero, dia, dataInicialObj, props.escala) ||
-                       isFolga(anoSelecionado, mes.numero, dia, dataInicialObj, props.escala)
+                color: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala) ||
+                       scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
                   ? 'white'
                   : '#4b5563'
               }"
@@ -75,14 +75,14 @@
     </div>
     
     <!-- Modal de Anotações -->
-    <Anotacoes v-model="modalAnotacoesAberto" :data="dataSelecionada" @anotacao-salva="atualizarAnotacoes" />
+    <Anotacoes />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { gerarDiasDoMes, isTrabalho, isFolga } from '../utils/escala'
-import { verificarAnotacao, abrirModalAnotacoes as abrirModal, atualizarAnotacoes as atualizarDias } from '../utils/anotacoes'
+import { useScheduleStore } from '../stores/schedule'
+import { useNoteStore } from '../stores/note'
 import Anotacoes from './Anotacoes.vue'
 
 const props = defineProps<{
@@ -97,49 +97,8 @@ const props = defineProps<{
 
 defineEmits(['update:modelValue'])
 
-// Estado para o modal de anotações e anotações dos dias
-const modalAnotacoesAberto = ref(false)
-const dataSelecionada = ref(new Date())
-const anotacoesDias = ref<Record<string, boolean>>({})
-
-// Formatar data para usar como chave
-function formatarDataChave(data: Date): string {
-  const ano = data.getFullYear()
-  const mes = (data.getMonth() + 1).toString().padStart(2, '0')
-  const dia = data.getDate().toString().padStart(2, '0')
-  return `${ano}-${mes}-${dia}`
-}
-
-// Verificar se um dia tem anotação
-function temAnotacao(ano: number, mes: number, dia: number): boolean {
-  // O mês já está no formato correto (0-11) pois vem do array 'meses'
-  const data = new Date(ano, mes, dia)
-  const chave = formatarDataChave(data)
-  return anotacoesDias.value[chave] || false
-}
-
-// Carregar anotações do ano selecionado
-async function carregarAnotacoesAno() {
-  for (let mes = 0; mes < 12; mes++) {
-    const ultimoDia = new Date(anoSelecionado.value, mes + 1, 0).getDate()
-    for (let dia = 1; dia <= ultimoDia; dia++) {
-      const data = new Date(anoSelecionado.value, mes, dia)
-      const chave = formatarDataChave(data)
-      anotacoesDias.value[chave] = await verificarAnotacao(data)
-    }
-  }
-}
-
-// Abrir modal de anotações ao clicar em um dia
-function abrirModalAnotacoes(mes: number, dia: number) {
-  abrirModal(dataSelecionada, modalAnotacoesAberto, anoSelecionado.value, mes, dia)
-}
-
-// Atualizar quando uma anotação for salva
-async function atualizarAnotacoes() {
-  await carregarAnotacoesAno()
-  atualizarDias(meses)
-}
+const scheduleStore = useScheduleStore()
+const noteStore = useNoteStore()
 
 // Definir variáveis de ano primeiro
 const anoAtual = new Date().getFullYear()
@@ -151,10 +110,26 @@ const dataInicialObj = computed(() => {
   return new Date(props.dataInicial)
 })
 
+// Verificar se um dia tem anotação
+function temAnotacao(ano: number, mes: number, dia: number): boolean {
+  return noteStore.verificarAnotacao(new Date(ano, mes, dia))
+}
+
+// Carregar anotações do ano selecionado
+async function carregarAnotacoesAno() {
+  await noteStore.carregarAnotacoes()
+}
+
+// Abrir modal de anotações ao clicar em um dia
+function abrirModalAnotacoes(mes: number, dia: number) {
+  const data = new Date(anoSelecionado.value, mes, dia)
+  noteStore.abrirModal(data)
+}
+
 // Observar mudanças no ano selecionado
 watch(() => props.modelValue, async (novoValor) => {
   if (novoValor) {
-    await carregarAnotacoesAno();
+    await carregarAnotacoesAno()
   }
 })
 
@@ -170,7 +145,11 @@ const anosDisponiveis = computed(() => {
 const meses = computed(() => {
   return Array.from({ length: 12 }, (_, i) => {
     const data = new Date(anoSelecionado.value, i, 1)
-    const { dias, diasAntes, diasDepois } = gerarDiasDoMes(data)
+    const diasAntes = data.getDay()
+    const ultimoDia = new Date(anoSelecionado.value, i + 1, 0)
+    const totalDias = ultimoDia.getDate()
+    const diasDepois = 42 - (diasAntes + totalDias)
+    const dias = Array.from({ length: totalDias }, (_, i) => i + 1)
 
     return {
       numero: i,

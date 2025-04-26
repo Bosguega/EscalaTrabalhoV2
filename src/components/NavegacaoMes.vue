@@ -14,8 +14,8 @@
   
       <!-- Texto do mês com animação -->
       <transition
-        :enter-active-class="selectedAnimation.enter"
-        :leave-active-class="selectedAnimation.leave"
+        :enter-active-class="animationStore.selectedAnimation.enter"
+        :leave-active-class="animationStore.selectedAnimation.leave"
         mode="out-in"
       >
         <span 
@@ -42,7 +42,9 @@
   
   <script setup lang="ts">
   import { computed, onMounted } from 'vue'
-  import { selectedAnimation, loadAnimationPreference } from '../utils/animations'
+  import { useAnimationStore } from '../stores/animation'
+  
+  const animationStore = useAnimationStore()
   
   const props = defineProps<{ data: Date }>()
   const emit = defineEmits<{
@@ -68,7 +70,7 @@
   
   // Carregar preferência de animação ao montar o componente
   onMounted(() => {
-    loadAnimationPreference()
+    animationStore.loadAnimationPreference()
   })
   </script>
   

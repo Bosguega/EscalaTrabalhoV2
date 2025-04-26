@@ -17,7 +17,7 @@
   </template>
   
   <script setup lang="ts">
-  import { getCurrentTheme } from '../utils/theme'
+  import { useThemeStore } from '../stores/theme'
   
   const props = defineProps<{
     texto?: string
@@ -30,20 +30,22 @@
     (e: 'click'): void
   }>()
   
+  const themeStore = useThemeStore()
+  
   function getButtonColor() {
     if (props.disabled) {
-      return getCurrentTheme().border
+      return themeStore.getCurrentTheme().border
     }
     
     switch (props.tipo) {
       case 'primary':
-        return getCurrentTheme().primary
+        return themeStore.getCurrentTheme().primary
       case 'secondary':
-        return getCurrentTheme().secondary
+        return themeStore.getCurrentTheme().secondary
       case 'danger':
-        return getCurrentTheme().folga
+        return themeStore.getCurrentTheme().folga
       default:
-        return getCurrentTheme().primary
+        return themeStore.getCurrentTheme().primary
     }
   }
   

@@ -1,4 +1,6 @@
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { carregarDados, salvarDados } from '../utils/useDadosApp'
 
 // Interface para definir a estrutura de uma animação
 export interface Animation {
@@ -10,7 +12,7 @@ export interface Animation {
 }
 
 // Lista de animações disponíveis
-export const animations: Animation[] = [
+const animations: Animation[] = [
   {
     id: 'fade',
     name: 'Fade',
@@ -55,31 +57,40 @@ export const animations: Animation[] = [
   }
 ]
 
-// Estado da animação selecionada
-export const selectedAnimation = ref<Animation>(animations[0])
+export const useAnimationStore = defineStore('animation', () => {
+  const selectedAnimation = ref<Animation>(animations[0])
 
-// Função para selecionar uma animação pelo ID
-export function selectAnimation(id: string): void {
-  const animation = animations.find(anim => anim.id === id)
-  if (animation) {
-    selectedAnimation.value = animation
-    // Salvar preferência do usuário
+  // Função para selecionar uma animação pelo ID
+  async function selectAnimation(id: string): Promise<void> {
+    const animation = animations.find(anim => anim.id === id)
+    if (animation) {
+      selectedAnimation.value = animation
+      // Salvar preferência do usuário
+      try {
+        const dados = await carregarDados()
+        await salvarDados({ ...dados, animacao: id })
+      } catch (error) {
+        console.error('Erro ao salvar animação:', error)
+      }
+    }
+  }
+
+  // Carregar preferência do usuário do localStorage
+  async function loadAnimationPreference(): Promise<void> {
     try {
-      localStorage.setItem('selectedAnimation', id)
+      const dados = await carregarDados()
+      if (dados.animacao) {
+        selectAnimation(dados.animacao)
+      }
     } catch (error) {
-      console.error('Erro ao salvar animação:', error)
+      console.error('Erro ao carregar animação:', error)
     }
   }
-}
 
-// Carregar preferência do usuário do localStorage
-export function loadAnimationPreference(): void {
-  try {
-    const savedAnimation = localStorage.getItem('selectedAnimation')
-    if (savedAnimation) {
-      selectAnimation(savedAnimation)
-    }
-  } catch (error) {
-    console.error('Erro ao carregar animação:', error)
+  return {
+    animations,
+    selectedAnimation,
+    selectAnimation,
+    loadAnimationPreference
   }
-}
+}) 

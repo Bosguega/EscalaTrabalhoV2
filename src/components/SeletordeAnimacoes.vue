@@ -3,7 +3,7 @@
     <h3 class="text-md font-medium text-gray-800 dark:text-white mb-3">Animações de Transição</h3>
     
     <div class="space-y-2">
-      <div v-for="animation in animations" :key="animation.id" class="flex items-center">
+      <div v-for="animation in animationStore.animations" :key="animation.id" class="flex items-center">
         <input 
           type="radio" 
           :id="`animation-${animation.id}`" 
@@ -44,8 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { animations, selectAnimation, selectedAnimation, loadAnimationPreference } from '../utils/animations'
+import { ref, computed, onMounted } from 'vue'
+import { useAnimationStore } from '../stores/animation'
+
+const animationStore = useAnimationStore()
 
 // Estado para controlar a visualização da animação
 const isPreviewVisible = ref(false)
@@ -53,8 +55,8 @@ const previewClass = ref('')
 
 // ID da animação selecionada
 const selectedAnimationId = computed({
-  get: () => selectedAnimation.value.id,
-  set: (id: string) => selectAnimation(id)
+  get: () => animationStore.selectedAnimation.id,
+  set: (id: string) => animationStore.selectAnimation(id)
 })
 
 // Função para visualizar a animação
@@ -65,7 +67,7 @@ function previewAnimation() {
   
   // Aplicar a animação após um pequeno delay para garantir o reset
   setTimeout(() => {
-    const animation = animations.find(a => a.id === selectedAnimationId.value)
+    const animation = animationStore.animations.find(a => a.id === selectedAnimationId.value)
     if (animation) {
       previewClass.value = animation.enter
     }
@@ -74,7 +76,7 @@ function previewAnimation() {
 
 // Carregar preferência de animação ao montar o componente
 onMounted(() => {
-  loadAnimationPreference()
+  animationStore.loadAnimationPreference()
 })
 </script>
 
