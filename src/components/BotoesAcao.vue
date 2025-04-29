@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-wrap gap-4 justify-center">
-      <ModalAnoCompleto v-model="modalAnoAberto" :cores="cores" :escala="props.escala" :data-inicial="props.dataInicial" />
+      <ModalAnoCompleto v-model="modalAnoAberto" :cores="cores" :escala="props.escala" :data-inicial="props.dataInicial" @navegar-para-mes="navegarParaMes" />
       <ModalConfiguracao v-model="modalConfigAberto" :escala-atual="props.escala" :data-inicial="props.dataInicial" @atualizar-escala="atualizarEscala" @atualizar-data-inicial="(novaData) => emit('atualizar-data-inicial', novaData)" />
       <!-- Botão: Configurar Escala -->
       <button
@@ -52,7 +52,7 @@
     dataInicial: Date
   }>()
 
-  const emit = defineEmits(['atualizar-escala', 'atualizar-data-inicial'])
+  const emit = defineEmits(['atualizar-escala', 'atualizar-data-inicial', 'update:data'])
 
   const modalAnoAberto = ref(false)
   const modalConfigAberto = ref(false)
@@ -67,6 +67,10 @@
 
   function atualizarEscala(novaEscala: string) {
     emit('atualizar-escala', novaEscala)
+  }
+
+  function navegarParaMes(data: Date) {
+    emit('update:data', data)
   }
   </script>
   

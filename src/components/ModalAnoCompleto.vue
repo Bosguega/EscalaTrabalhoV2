@@ -12,7 +12,7 @@
           </select>
         </div>
         <button
-          @click="$emit('update:modelValue', false)"
+          @click="emit('update:modelValue', false)"
           class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-800 dark:text-gray-200"
           aria-label="Fechar modal"
         >
@@ -24,7 +24,10 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div v-for="mes in meses" :key="mes.numero" class="border rounded-lg p-4 dark:border-gray-600 dark:text-gray-200">
-          <h3 class="text-lg font-semibold mb-2">{{ mes.nome }}</h3>
+          <h3 
+            class="text-lg font-semibold mb-2 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            @click="navegarParaMes(mes.numero)"
+          >{{ mes.nome }}</h3>
           <div class="grid grid-cols-7 gap-1 text-center">
             <div
               v-for="dia in ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']"
@@ -95,7 +98,7 @@ const props = defineProps<{
   dataInicial: Date
 }>()
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'navegar-para-mes'])
 
 const scheduleStore = useScheduleStore()
 const noteStore = useNoteStore()
@@ -124,6 +127,13 @@ async function carregarAnotacoesAno() {
 function abrirModalAnotacoes(mes: number, dia: number) {
   const data = new Date(anoSelecionado.value, mes, dia)
   noteStore.abrirModal(data)
+}
+
+// Navegar para o mês selecionado no calendário principal
+function navegarParaMes(mes: number) {
+  const data = new Date(anoSelecionado.value, mes, 1)
+  emit('navegar-para-mes', data)
+  emit('update:modelValue', false)
 }
 
 // Observar mudanças no ano selecionado
