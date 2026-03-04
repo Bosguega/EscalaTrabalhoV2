@@ -1,13 +1,12 @@
 <template>
   <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="rounded-lg p-6 max-w-md w-full" :class="isDark ? 'dark:bg-gray-800 dark:text-gray-200' : 'bg-white text-gray-800'">
+    <div class="bg-background text-text border border-border rounded-lg p-6 max-w-md w-full shadow-xl">
       <!-- Cabeçalho -->
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Anotações - {{ noteStore.formatarData(noteStore.dataSelecionada!) }}</h2>
         <button
           @click="fecharModal"
-          class="p-2 hover:bg-opacity-20 rounded-full"
-          :class="isDark ? 'dark:hover:bg-gray-700' : 'hover:bg-gray-100'"
+          class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
           aria-label="Fechar modal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -24,8 +23,7 @@
           <label class="block text-sm font-medium mb-1">Anotação</label>
           <textarea
             v-model="anotacaoLocal"
-            class="w-full border rounded-md py-2 px-3 focus:outline-none focus:ring-2 min-h-[120px]"
-            :class="isDark ? 'dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600' : 'bg-white text-gray-800 border-gray-300'"
+            class="w-full bg-background text-text border border-border rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-primary min-h-[120px] transition-colors"
             placeholder="Digite sua anotação para este dia..."
           ></textarea>
         </div>
@@ -52,7 +50,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { isDark } from '../utils/theme'
 import { useNoteStore } from '../stores/note'
 
 const noteStore = useNoteStore()

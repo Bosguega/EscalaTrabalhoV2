@@ -1,70 +1,75 @@
 <template>
-  <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full mx-2 sm:mx-0 sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl transition-all duration-200">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl sm:text-2xl font-bold dark:text-gray-200">Configurar Escala</h2>
+  <div v-if="modelValue" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+    <div class="bg-card border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl transform transition-all duration-300 scale-100">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-text tracking-tight">Configurar Escala</h2>
         <button
           @click="$emit('update:modelValue', false)"
-          class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          class="p-2 hover:bg-secondary/50 rounded-xl text-text opacity-50 hover:opacity-100 transition-all focus:outline-none"
           aria-label="Fechar modal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                   d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-6">
         <!-- Escala -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selecione uma escala</label>
+          <label class="block text-xs font-bold text-text opacity-40 uppercase tracking-widest mb-2">Selecione uma escala</label>
           <div class="relative">
             <select
               v-model="escalaLocal"
-              class="w-full border rounded-md py-3 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+              class="w-full bg-secondary/30 text-text border border-border rounded-2xl py-4 px-4 text-base focus:outline-none focus:ring-2 focus:ring-primary appearance-none transition-all"
               @change="mostrarOpcoesCriarRemover = false"
             >
-              <option value="" disabled>Selecione uma escala</option>
-              <option v-for="escala in escalasDisponiveis" :key="escala.valor" :value="escala.valor">
+              <option value="" disabled class="bg-card">Selecione uma escala</option>
+              <option v-for="escala in escalasDisponiveis" :key="escala.valor" :value="escala.valor" class="bg-card">
                 {{ escala.nome }}
               </option>
-              <option value="nova-escala">+ Criar Nova Escala</option>
-              <option v-if="escalasPersonalizadas.length > 0" value="remover-escala">🗑️ Remover Escala</option>
+              <option value="nova-escala" class="bg-card font-bold text-primary">+ Criar Nova Escala</option>
+              <option v-if="escalasPersonalizadas.length > 0" value="remover-escala" class="bg-card font-bold text-folga">🗑️ Remover Escala</option>
             </select>
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
         </div>
         
         <!-- Formulário para criar nova escala -->
-        <div v-if="escalaLocal === 'nova-escala'" class="border p-3 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <h3 class="font-medium mb-2">Criar Nova Escala</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+        <div v-if="escalaLocal === 'nova-escala'" class="border border-primary/30 p-4 rounded-2xl bg-primary/5 space-y-4">
+          <h3 class="font-bold text-primary">Criar Nova Escala</h3>
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-700 dark:text-gray-300">Dias de Trabalho</label>
+              <label class="block text-xs font-bold text-text opacity-40 uppercase mb-1">Trabalho (Dias)</label>
               <input 
                 type="number" 
                 v-model="novaEscalaDiasTrabalho" 
                 min="1" 
                 max="30"
-                class="w-full border rounded-md py-2 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 text-base"
+                class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
             <div>
-              <label class="block text-sm text-gray-700 dark:text-gray-300">Dias de Folga</label>
+              <label class="block text-xs font-bold text-text opacity-40 uppercase mb-1">Folga (Dias)</label>
               <input 
                 type="number" 
                 v-model="novaEscalaDiasFolga" 
                 min="1" 
                 max="30"
-                class="w-full border rounded-md py-2 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 text-base"
+                class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
           </div>
           <div class="flex justify-end">
             <button 
               @click="adicionarNovaEscala" 
-              class="px-4 py-2 bg-green-600 text-white text-base rounded hover:bg-green-700 transition min-w-[100px]"
+              class="px-6 py-2 bg-primary text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg active:scale-95"
             >
               Adicionar
             </button>
@@ -72,14 +77,14 @@
         </div>
         
         <!-- Opções para remover escala -->
-        <div v-if="escalaLocal === 'remover-escala'" class="border p-3 rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <h3 class="font-medium mb-2 dark:text-gray-200">Remover Escala</h3>
+        <div v-if="escalaLocal === 'remover-escala'" class="border border-folga/30 p-4 rounded-2xl bg-folga/5 space-y-4">
+          <h3 class="font-bold text-folga">Remover Escala</h3>
           <div class="mb-2">
             <select
               v-model="escalaParaRemover"
-              class="w-full border rounded-md py-2 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 text-base"
+              class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-folga text-text"
             >
-              <option value="" disabled selected>Selecione uma escala para remover</option>
+              <option value="" disabled selected>Selecione uma escala</option>
               <option v-for="escala in escalasPersonalizadas" :key="escala.valor" :value="escala.valor">
                 {{ escala.nome }}
               </option>
@@ -89,7 +94,7 @@
             <button 
               @click="removerEscala" 
               :disabled="!escalaParaRemover"
-              class="px-4 py-2 bg-red-600 text-white text-base rounded hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-gray-600 min-w-[100px]"
+              class="px-6 py-2 bg-folga text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:scale-100 shadow-lg active:scale-95"
             >
               Remover
             </button>
@@ -98,30 +103,32 @@
 
         <!-- Data inicial -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Primeiro Dia de Trabalho</label>
+          <label class="block text-xs font-bold text-text opacity-40 uppercase tracking-widest mb-2">Primeiro Dia de Trabalho</label>
           <input
             type="date"
             v-model="dataInicialLocal"
-            class="w-full border rounded-md py-3 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full bg-secondary/30 border border-border rounded-2xl py-4 px-4 text-text focus:outline-none focus:ring-2 focus:ring-primary transition-all"
           >
         </div>
 
-<!-- Botões -->
-<div class="flex flex-col sm:flex-row justify-between gap-2 mt-6">
-  <BaseButton
-    texto="Cancelar"
-    tipo="secondary"
-    fullWidth
-    @click="$emit('update:modelValue', false)"
-  />
-  <BaseButton
-    texto="Aplicar"
-    tipo="primary"
-    fullWidth
-    :disabled="escalaLocal === 'nova-escala' || escalaLocal === 'remover-escala'"
-    @click="salvarEscala"
-  />
-</div>
+        <!-- Botões -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 mt-8">
+          <BaseButton
+            texto="Cancelar"
+            tipo="secondary"
+            fullWidth
+            class="!rounded-2xl !py-4"
+            @click="$emit('update:modelValue', false)"
+          />
+          <BaseButton
+            texto="Aplicar"
+            tipo="primary"
+            fullWidth
+            class="!rounded-2xl !py-4 shadow-lg"
+            :disabled="escalaLocal === 'nova-escala' || escalaLocal === 'remover-escala'"
+            @click="salvarEscala"
+          />
+        </div>
       </div>
     </div>
   </div>

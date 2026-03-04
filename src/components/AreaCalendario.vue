@@ -1,10 +1,10 @@
 <template>
   <div
-    class="w-full max-w-md mx-auto mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+    class="w-full max-w-md mx-auto mt-6 bg-card border border-border rounded-2xl shadow-sm p-4"
     ref="calendario"
   >
     <!-- Cabeçalho dos dias da semana -->
-    <div class="grid grid-cols-7 text-center font-semibold text-gray-600 dark:text-gray-300 mb-2">
+    <div class="grid grid-cols-7 text-center text-[10px] font-bold text-text opacity-40 uppercase tracking-widest mb-4">
       <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
     </div>
 
@@ -16,26 +16,35 @@
     >
       <div
         :key="mes"
-        class="grid grid-cols-7 text-center gap-1 w-full"
+        class="grid grid-cols-7 text-center gap-2 w-full"
       >
         <div
           v-for="(dia, index) in diasDoMes"
           :key="`${mes}-${index}`"
-          class="aspect-square flex items-center justify-center text-sm rounded relative cursor-pointer"
+          class="aspect-square flex items-center justify-center text-base font-medium rounded-xl relative cursor-pointer border transition-all duration-200"
           :class="[`animate__delay-${Math.min(index % 7, 5)}0ms`]"
           :style="{
+            borderColor: dia.ativo
+              ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
+                ? 'var(--color-trabalho)'
+                : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
+                  ? 'var(--color-folga)'
+                  : 'var(--color-border)'
+              : 'transparent',
             backgroundColor: dia.ativo
               ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? props.cores.trabalho
+                ? 'rgba(var(--color-trabalho-rgb, 239, 68, 68), 0.1)'
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                  ? props.cores.folga
+                  ? 'rgba(var(--color-folga-rgb, 16, 185, 129), 0.1)'
                   : 'transparent'
               : 'transparent',
             color: dia.ativo
-              ? (scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala) || 
-                 scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? 'white' : '#4b5563')
-              : '#9ca3af'
+              ? (scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
+                ? 'var(--color-trabalho)'
+                : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
+                  ? 'var(--color-folga)'
+                  : 'var(--color-text)')
+              : 'rgba(var(--color-text-rgb, 255, 255, 255), 0.2)'
           }"
           @click="abrirModalAnotacoes(dia)"
         >

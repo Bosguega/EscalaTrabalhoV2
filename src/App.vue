@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+  <div class="min-h-screen bg-background text-text font-sans transition-colors duration-300">
     <Cabecalho @toggle-sidebar="toggleMenuLateral" />
     <BotoesAcao v-model:data="dataAtual" :cores="scheduleStore.cores" :escala="scheduleStore.escalaAtual" :data-inicial="scheduleStore.dataInicial" @atualizar-escala="scheduleStore.atualizarEscala" @atualizar-data-inicial="scheduleStore.atualizarDataInicial" />
     <NavegacaoMes v-model:data="dataAtual" />

@@ -1,42 +1,44 @@
 <template>
-    <div class="flex items-center justify-between max-w-md mx-auto mt-4">
-      <!-- Botão anterior -->
-      <button
-        @click="anterior"
-        class="p-2 bg-purple-300 dark:bg-gray-700 rounded hover:bg-purple-400 dark:hover:bg-gray-600 transition text-white dark:text-gray-200"
-        aria-label="Mês anterior"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-  
-      <!-- Texto do mês com animação -->
-      <transition
-        :enter-active-class="animationStore.selectedAnimation.enter"
-        :leave-active-class="animationStore.selectedAnimation.leave"
-        mode="out-in"
-      >
-        <span 
-          :key="`${nomeMes}-${ano}`" 
-          class="text-lg font-medium text-gray-800 dark:text-gray-200"
+    <div class="max-w-md mx-auto mt-4 px-4">
+      <div class="flex items-center justify-between bg-card border border-border rounded-2xl p-4 shadow-sm">
+        <!-- Botão anterior -->
+        <button
+          @click="anterior"
+          class="p-2 text-text opacity-50 hover:opacity-100 transition-all rounded-lg hover:bg-secondary/30"
+          aria-label="Mês anterior"
         >
-          {{ nomeMes }} {{ ano }}
-        </span>
-      </transition>
-  
-      <!-- Botão próximo -->
-      <button
-        @click="proximo"
-        class="p-2 bg-purple-300 dark:bg-gray-700 rounded hover:bg-purple-400 dark:hover:bg-gray-600 transition text-white dark:text-gray-200"
-        aria-label="Próximo mês"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+    
+        <!-- Texto do mês com animação -->
+        <transition
+          :enter-active-class="animationStore.selectedAnimation.enter"
+          :leave-active-class="animationStore.selectedAnimation.leave"
+          mode="out-in"
+        >
+          <span 
+            :key="`${nomeMes}-${ano}`" 
+            class="text-xl font-bold text-text tracking-tight"
+          >
+            {{ nomeMes }} {{ ano }}
+          </span>
+        </transition>
+    
+        <!-- Botão próximo -->
+        <button
+          @click="proximo"
+          class="p-2 text-text opacity-50 hover:opacity-100 transition-all rounded-lg hover:bg-secondary/30"
+          aria-label="Próximo mês"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
     </div>
   </template>
   
