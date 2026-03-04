@@ -87,11 +87,6 @@ function abrirModalAnotacoes(dia: { numero: number | string, ativo: boolean }) {
   noteStore.abrirModal(data)
 }
 
-async function atualizarAnotacoes() {
-  await noteStore.carregarAnotacoes()
-  atualizarDiasDoMes()
-}
-
 function temAnotacao(ano: number, mes: number, dia: number): boolean {
   return noteStore.verificarAnotacao(new Date(ano, mes, dia))
 }
@@ -169,32 +164,5 @@ onMounted(() => {
     e.preventDefault()
   }, { passive: false })
 })
-
-// Dias da semana
-const diasDaSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-
-// Calcula as semanas do mês
-const semanas = computed(() => {
-  return scheduleStore.calcularDiasDoMes(props.data)
-})
-
-// Retorna a classe CSS para a célula do calendário
-function getCelulaClasse(dia: Date): string {
-  const ehDiaDeTrabalho = scheduleStore.isDiaTrabalho(
-    dia,
-    props.dataInicial,
-    props.escala
-  )
-
-  return ehDiaDeTrabalho
-    ? `bg-${scheduleStore.cores.trabalho} hover:bg-${scheduleStore.cores.trabalho}/80`
-    : `bg-${scheduleStore.cores.folga} hover:bg-${scheduleStore.cores.folga}/80`
-}
-
-// Função para alternar o estado do dia (trabalho/folga)
-function toggleDia(dia: Date) {
-  // Implementar lógica de toggle se necessário
-  console.log('Toggle dia:', dia)
-}
 
 </script>

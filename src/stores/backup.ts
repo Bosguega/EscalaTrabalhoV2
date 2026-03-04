@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import localforage from 'localforage'
 import type { DadosApp } from '../utils/useDadosApp'
-import { dadosPadrao } from '../utils/useDadosApp'
 
 interface BackupMetadata {
   timestamp: number

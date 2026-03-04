@@ -33,7 +33,7 @@
   </template>
   
   <script setup lang="ts">
-  import { isDark, toggleTheme, getCurrentTheme } from '../utils/theme'
+  import { isDark, toggleTheme } from '../utils/theme'
 
   const emit = defineEmits(['toggle-sidebar'])
 

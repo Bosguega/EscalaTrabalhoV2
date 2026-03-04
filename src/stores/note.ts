@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { carregarDados, salvarDados } from '../utils/useDadosApp'
 
 export const useNoteStore = defineStore('note', () => {
@@ -22,10 +22,10 @@ export const useNoteStore = defineStore('note', () => {
 
   function formatarData(data: Date): string {
     if (!data) return ''
-    return data.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: 'long', 
-      year: 'numeric' 
+    return data.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     })
   }
 
@@ -47,9 +47,9 @@ export const useNoteStore = defineStore('note', () => {
       anotacoes.value[dataFormatada] = texto
 
       const dados = await carregarDados()
-      await salvarDados({ 
-        ...dados, 
-        anotacoes: JSON.stringify(anotacoes.value) 
+      await salvarDados({
+        ...dados,
+        anotacoes: JSON.stringify(anotacoes.value)
       })
     } catch (error) {
       console.error('Erro ao salvar anotação:', error)
@@ -58,8 +58,8 @@ export const useNoteStore = defineStore('note', () => {
 
   function verificarAnotacao(data: Date): boolean {
     const dataFormatada = formatarDataChave(data)
-    return !!anotacoes.value[dataFormatada] && 
-           anotacoes.value[dataFormatada].trim() !== ''
+    return !!anotacoes.value[dataFormatada] &&
+      anotacoes.value[dataFormatada].trim() !== ''
   }
 
   function carregarAnotacao(data: Date): string {

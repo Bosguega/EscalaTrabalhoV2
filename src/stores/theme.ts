@@ -54,7 +54,7 @@ export const useThemeStore = defineStore('theme', () => {
       console.warn('⚠️ Erro ao carregar tema, usando tema padrão.')
       isDark.value = false
     }
-    
+
     applyTheme()
   }
 

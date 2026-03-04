@@ -130,7 +130,7 @@
 <script setup lang="ts">
 import { ref, watchEffect, onMounted } from 'vue'
 import BaseButton from './BaseButton.vue'
-import { salvarConfiguracao, carregarConfiguracao } from '../utils/escala'
+import { salvarConfiguracao } from '../utils/escala'
 
 const props = defineProps<{
   modelValue: boolean

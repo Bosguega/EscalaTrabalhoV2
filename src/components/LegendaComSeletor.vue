@@ -4,7 +4,7 @@
     <div class="flex items-center gap-2">
       <label class="w-24 h-10 flex items-center justify-center rounded-lg border dark:border-gray-600 cursor-pointer" :style="{ backgroundColor: corTrabalho }">
         <span class="text-white text-sm">Trabalho</span>
-        <input type="color" :value="corTrabalho" @input="e => corTrabalho = e.target.value" class="opacity-0 w-0 h-0" />
+        <input type="color" :value="corTrabalho" @input="e => corTrabalho = (e.target as HTMLInputElement).value" class="opacity-0 w-0 h-0" />
       </label>
     </div>
 
@@ -12,7 +12,7 @@
     <div class="flex items-center gap-2">
       <label class="w-24 h-10 flex items-center justify-center rounded-lg border dark:border-gray-600 cursor-pointer" :style="{ backgroundColor: corFolga }">
         <span class="text-white text-sm">Folga</span>
-        <input type="color" :value="corFolga" @input="e => corFolga = e.target.value" class="opacity-0 w-0 h-0" />
+        <input type="color" :value="corFolga" @input="e => corFolga = (e.target as HTMLInputElement).value" class="opacity-0 w-0 h-0" />
       </label>
     </div>
   </div>
@@ -20,7 +20,7 @@
   
   <script setup lang="ts">
   import { ref, watch, onMounted, watchEffect } from 'vue'
-import { getCurrentTheme, isDark } from '../utils/theme'
+import { getCurrentTheme } from '../utils/theme'
   
 const emit = defineEmits(['atualizar-cores'])
   

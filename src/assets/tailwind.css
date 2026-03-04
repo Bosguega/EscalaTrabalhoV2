@@ -36,6 +36,7 @@
 a {
   @apply font-medium text-blue-500 no-underline;
 }
+
 a:hover {
   @apply text-blue-400;
 }
