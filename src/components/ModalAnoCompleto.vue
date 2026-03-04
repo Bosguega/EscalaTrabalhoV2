@@ -56,20 +56,20 @@
               class="aspect-square flex items-center justify-center text-xs font-medium rounded-lg transition-all duration-200 relative cursor-pointer border"
               :style="{
                 borderColor: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                  ? 'var(--color-trabalho)'
+                  ? props.cores.trabalho
                   : scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                    ? 'var(--color-folga)'
+                    ? props.cores.folga
                     : 'transparent',
                 backgroundColor: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                  ? 'rgb(var(--color-trabalho) / 0.15)'
+                  ? props.cores.trabalho + '26'
                   : scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                    ? 'rgb(var(--color-folga) / 0.15)'
+                    ? props.cores.folga + '26'
                     : 'transparent',
                 color: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                  ? 'var(--color-trabalho)'
+                  ? props.cores.trabalho
                   : scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                    ? 'var(--color-folga)'
-                    : 'var(--color-text)'
+                    ? props.cores.folga
+                    : 'rgb(var(--color-text))'
               }"
               @click="abrirModalAnotacoes(mes.numero, dia)"
             >

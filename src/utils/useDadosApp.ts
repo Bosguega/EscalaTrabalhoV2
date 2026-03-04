@@ -1,4 +1,7 @@
 import localforage from 'localforage'
+import type { ThemeName } from '../types/theme'
+
+const STORAGE_KEY = 'appData'
 
 // Tipo principal dos dados do app
 export interface DadosApp {
@@ -6,7 +9,7 @@ export interface DadosApp {
   escala: string | null
   anotacoes: string | null
   animacao: string | null
-  tema: string | null
+  tema: ThemeName | null
 }
 
 // Valores padrão
@@ -18,54 +21,70 @@ export const dadosPadrao: DadosApp = {
   tema: null
 }
 
-// Função de migração (exemplo da v1 para v2)
+// =====================
+// Migrações
+// =====================
+
 function migrarV1paraV2(dadosV1: any): DadosApp {
   return {
     versao: 2,
-    escala: dadosV1.escala || null,
-    anotacoes: dadosV1.anotacoes || null,
-    animacao: dadosV1.animacao || null,
-    tema: dadosV1.tema || null
+    escala: dadosV1.escala ?? null,
+    anotacoes: dadosV1.anotacoes ?? null,
+    animacao: dadosV1.animacao ?? null,
+    tema: dadosV1.tema ?? null
   }
 }
 
-// Carregar dados do app (com migração)
+// =====================
+// Carregar dados
+// =====================
+
 export async function carregarDados(): Promise<DadosApp> {
   try {
-    const dadosBrutos = await localforage.getItem('appData')
+    const dadosBrutos = await localforage.getItem(STORAGE_KEY)
 
     if (!dadosBrutos || typeof dadosBrutos !== 'object') {
-      return dadosPadrao
+      return { ...dadosPadrao }
     }
 
-    const versao = (dadosBrutos as any).versao || 1
+    const versao = (dadosBrutos as any).versao ?? 1
 
     switch (versao) {
       case 2:
-        return dadosBrutos as DadosApp
+        // Merge garante compatibilidade futura
+        return { ...dadosPadrao, ...(dadosBrutos as DadosApp) }
+
       case 1:
         const migrado = migrarV1paraV2(dadosBrutos)
         await salvarDados(migrado)
         return migrado
+
       default:
-        return dadosPadrao
+        return { ...dadosPadrao }
     }
+
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
-    return dadosPadrao
+    return { ...dadosPadrao }
   }
 }
 
-// Salvar dados do app
+// =====================
+// Salvar dados
+// =====================
+
 export async function salvarDados(dados: DadosApp): Promise<void> {
   try {
-    await localforage.setItem('appData', dados)
+    await localforage.setItem(STORAGE_KEY, { ...dados })
   } catch (error) {
     console.error('Erro ao salvar dados:', error)
   }
 }
 
-// Resetar para os valores padrão
+// =====================
+// Resetar dados
+// =====================
+
 export async function resetarDados(): Promise<void> {
-  await localforage.setItem('appData', dadosPadrao)
+  await localforage.setItem(STORAGE_KEY, { ...dadosPadrao })
 }

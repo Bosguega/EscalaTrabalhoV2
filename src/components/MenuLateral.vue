@@ -48,9 +48,9 @@
                 <button 
                   v-for="theme in availableThemes" 
                   :key="theme.name"
-                  @click="setTheme(theme.name)"
+                  @click="themeStore.setTheme(theme.name)"
                   class="flex items-center space-x-2 p-2 rounded-md border text-sm transition-all"
-                  :class="currentTheme === theme.name 
+                  :class="themeStore.currentTheme === theme.name 
                     ? 'border-primary bg-primary/10 text-primary font-bold shadow-sm' 
                     : 'border-border bg-background text-text opacity-80 hover:opacity-100'"
                 >
@@ -112,7 +112,10 @@
 import { ref } from 'vue'
 import SeletordeAnimacoes from './SeletordeAnimacoes.vue'
 import MenuBackup from './MenuBackup.vue'
-import { availableThemes, currentTheme, setTheme } from '../utils/theme'
+import { useThemeStore } from '../stores/theme'
+
+const themeStore = useThemeStore()
+const availableThemes = themeStore.availableThemes
 
 // Definir props e emits
 defineProps<{ aberto: boolean }>()

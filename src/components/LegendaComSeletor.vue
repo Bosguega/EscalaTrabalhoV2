@@ -19,42 +19,30 @@
   </div>
 </template>
   
-  <script setup lang="ts">
-  import { ref, watch, onMounted, watchEffect } from 'vue'
-import { getCurrentTheme } from '../utils/theme'
-  
-const emit = defineEmits(['atualizar-cores'])
-  
-// Inicializa com as cores do tema atual
-const corTrabalho = ref(getCurrentTheme().trabalho)
-const corFolga = ref(getCurrentTheme().folga)
-  
-onMounted(() => {
-  // Prioriza cores salvas pelo usuário
-  const corTrabalhoSalva = localStorage.getItem('corTrabalho')
-  const corFolgaSalva = localStorage.getItem('corFolga')
-  if (corTrabalhoSalva) corTrabalho.value = corTrabalhoSalva
-  if (corFolgaSalva) corFolga.value = corFolgaSalva
-})
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 
-// Atualiza as cores quando o tema mudar
-watchEffect(() => {
-  // Só atualiza se não houver cores personalizadas salvas
-  if (!localStorage.getItem('corTrabalho')) {
-    corTrabalho.value = getCurrentTheme().trabalho
-  }
-  if (!localStorage.getItem('corFolga')) {
-    corFolga.value = getCurrentTheme().folga
-  }
-})
-  
-  watch([corTrabalho, corFolga], () => {
-    localStorage.setItem('corTrabalho', corTrabalho.value)
-    localStorage.setItem('corFolga', corFolga.value)
-    emit('atualizar-cores', {
-      trabalho: corTrabalho.value,
-      folga: corFolga.value
-    })
+const props = defineProps<{
+  cores: { trabalho: string; folga: string }
+}>()
+
+const emit = defineEmits(['atualizar-cores'])
+
+// Inicializa com as cores recebidas via props
+const corTrabalho = ref(props.cores.trabalho)
+const corFolga = ref(props.cores.folga)
+
+// Atualiza as cores locais se as props mudarem (ex: carregou dados do storage)
+watch(() => props.cores, (novasCores) => {
+  if (novasCores.trabalho) corTrabalho.value = novasCores.trabalho
+  if (novasCores.folga) corFolga.value = novasCores.folga
+}, { deep: true })
+
+watch([corTrabalho, corFolga], () => {
+  emit('atualizar-cores', {
+    trabalho: corTrabalho.value,
+    folga: corFolga.value
   })
-  </script>
+})
+</script>
   

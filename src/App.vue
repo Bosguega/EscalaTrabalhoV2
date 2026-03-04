@@ -4,7 +4,7 @@
     <BotoesAcao v-model:data="dataAtual" :cores="scheduleStore.cores" :escala="scheduleStore.escalaAtual" :data-inicial="scheduleStore.dataInicial" @atualizar-escala="scheduleStore.atualizarEscala" @atualizar-data-inicial="scheduleStore.atualizarDataInicial" />
     <NavegacaoMes v-model:data="dataAtual" />
     <AreaCalendario v-model:data="dataAtual" :cores="scheduleStore.cores" :escala="scheduleStore.escalaAtual" :data-inicial="scheduleStore.dataInicial" />
-    <LegendaComSeletor @atualizar-cores="scheduleStore.atualizarCores" />
+    <LegendaComSeletor :cores="scheduleStore.cores" @atualizar-cores="scheduleStore.atualizarCores" />
     <MenuLateral :aberto="menuLateralAberto" @fechar="fecharMenuLateral" />
   </div>
 </template>
@@ -17,7 +17,7 @@ import NavegacaoMes from './components/NavegacaoMes.vue'
 import AreaCalendario from './components/AreaCalendario.vue'
 import LegendaComSeletor from './components/LegendaComSeletor.vue'
 import MenuLateral from './components/MenuLateral.vue'
-import { loadThemePreference } from './utils/theme'
+import { useThemeStore } from './stores/theme'
 import { useScheduleStore } from './stores/schedule'
 
 // Estado do menu lateral
@@ -25,11 +25,12 @@ const menuLateralAberto = ref(false)
 const dataAtual = ref(new Date())
 
 // Inicializar stores
+const themeStore = useThemeStore()
 const scheduleStore = useScheduleStore()
 
 onMounted(async () => {
   // Carrega as preferências de tema
-  loadThemePreference()
+  await themeStore.loadThemePreference()
   
   // Carrega as configurações da escala
   await scheduleStore.carregarConfiguracao()

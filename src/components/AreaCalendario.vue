@@ -26,24 +26,24 @@
           :style="{
             borderColor: dia.ativo
               ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? 'var(--color-trabalho)'
+                ? props.cores.trabalho
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                  ? 'var(--color-folga)'
-                  : 'var(--color-border)'
+                  ? props.cores.folga
+                  : 'rgb(var(--color-border))'
               : 'transparent',
             backgroundColor: dia.ativo
               ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? 'rgb(var(--color-trabalho) / 0.1)'
+                ? props.cores.trabalho + '1a'
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                  ? 'rgb(var(--color-folga) / 0.1)'
+                  ? props.cores.folga + '1a'
                   : 'transparent'
               : 'transparent',
             color: dia.ativo
               ? (scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? 'var(--color-trabalho)'
+                ? props.cores.trabalho
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                  ? 'var(--color-folga)'
-                  : 'var(--color-text)')
+                  ? props.cores.folga
+                  : 'rgb(var(--color-text))')
               : 'rgb(var(--color-text) / 0.2)'
           }"
           @click="abrirModalAnotacoes(dia)"

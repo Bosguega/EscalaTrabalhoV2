@@ -137,7 +137,6 @@
 <script setup lang="ts">
 import { ref, watchEffect, onMounted } from 'vue'
 import BaseButton from './BaseButton.vue'
-import { salvarConfiguracao } from '../utils/escala'
 
 const props = defineProps<{
   modelValue: boolean
@@ -259,16 +258,6 @@ function salvarEscala() {
 
   emit('atualizar-escala', escalaLocal.value)
   emit('atualizar-data-inicial', dataObj)
-
-  // Salvar no localStorage
-  salvarConfiguracao({
-    escala: escalaLocal.value,
-    dataInicial: dataObj.toISOString(),
-    cores: {
-      trabalho: localStorage.getItem('corTrabalho') || undefined,
-      folga: localStorage.getItem('corFolga') || undefined
-    }
-  })
 
   emit('update:modelValue', false)
 }

@@ -27,8 +27,8 @@ export const useScheduleStore = defineStore('schedule', () => {
   const dataInicial = ref(new Date())
   const escalasPersonalizadas = ref<EscalaPersonalizada[]>([])
   const cores = ref({
-    trabalho: '#16a34a',
-    folga: '#9ca3af'
+    trabalho: '#ef4444',
+    folga: '#22c55e'
   })
 
   // Getters
@@ -43,42 +43,42 @@ export const useScheduleStore = defineStore('schedule', () => {
   function calcularDiasDoMes(data: Date): Date[][] {
     const primeiroDiaDoMes = new Date(data.getFullYear(), data.getMonth(), 1)
     const ultimoDiaDoMes = new Date(data.getFullYear(), data.getMonth() + 1, 0)
-    
+
     const diasDoMes: Date[][] = []
     let semanaAtual: Date[] = []
-    
+
     // Preenche os dias do mês anterior até o primeiro dia do mês atual
     for (let i = 0; i < primeiroDiaDoMes.getDay(); i++) {
       const dia = new Date(primeiroDiaDoMes)
       dia.setDate(dia.getDate() - (primeiroDiaDoMes.getDay() - i))
       semanaAtual.push(dia)
     }
-    
+
     // Preenche os dias do mês atual
     for (let dia = 1; dia <= ultimoDiaDoMes.getDate(); dia++) {
       const dataAtual = new Date(data.getFullYear(), data.getMonth(), dia)
       semanaAtual.push(dataAtual)
-      
+
       if (dataAtual.getDay() === 6) {
         diasDoMes.push(semanaAtual)
         semanaAtual = []
       }
     }
-    
+
     // Preenche os dias do próximo mês até completar a última semana
     if (semanaAtual.length > 0) {
       const ultimoDia = semanaAtual[semanaAtual.length - 1]
       const diasRestantes = 6 - ultimoDia.getDay()
-      
+
       for (let i = 1; i <= diasRestantes; i++) {
         const dia = new Date(ultimoDia)
         dia.setDate(dia.getDate() + i)
         semanaAtual.push(dia)
       }
-      
+
       diasDoMes.push(semanaAtual)
     }
-    
+
     return diasDoMes
   }
 
@@ -88,7 +88,7 @@ export const useScheduleStore = defineStore('schedule', () => {
     const dataAtual = new Date(data.getFullYear(), data.getMonth(), data.getDate())
     dataAtual.setHours(0, 0, 0, 0)
     const dataAtualMS = dataAtual.getTime()
-    
+
     const dataInicialObj = new Date(dataInicialParam)
     dataInicialObj.setHours(0, 0, 0, 0)
     const dataInicialMS = dataInicialObj.getTime()
@@ -123,8 +123,8 @@ export const useScheduleStore = defineStore('schedule', () => {
         dataInicial.value = config.dataInicial ? new Date(config.dataInicial) : new Date()
         if (config.cores) {
           cores.value = {
-            trabalho: config.cores.trabalho || '#16a34a',
-            folga: config.cores.folga || '#9ca3af'
+            trabalho: config.cores.trabalho || '#ef4444',
+            folga: config.cores.folga || '#22c55e'
           }
         }
       }
