@@ -1,12 +1,12 @@
 <template>
-  <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-background text-text border border-border rounded-lg p-6 max-w-md w-full shadow-xl">
+  <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-card text-text border border-border rounded-lg p-6 max-w-md w-full shadow-xl">
       <!-- Cabeçalho -->
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Anotações - {{ noteStore.formatarData(noteStore.dataSelecionada!) }}</h2>
+        <h2 class="text-xl font-bold">Anotações - {{ noteStore.formatarData(noteStore.dataSelecionada!) }}</h2>
         <button
           @click="fecharModal"
-          class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
+          class="p-2 hover:bg-text/10 rounded-full transition-colors font-medium"
           aria-label="Fechar modal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -20,25 +20,25 @@
       <!-- Corpo -->
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Anotação</label>
+          <label class="block text-sm font-medium mb-1 opacity-70">Sua Anotação</label>
           <textarea
             v-model="anotacaoLocal"
-            class="w-full bg-background text-text border border-border rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-primary min-h-[120px] transition-colors"
-            placeholder="Digite sua anotação para este dia..."
+            class="w-full bg-background text-text border border-border rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] transition-all resize-none"
+            placeholder="Digite algo para este dia..."
           ></textarea>
         </div>
 
         <!-- Botões -->
-        <div class="flex justify-between gap-2 mt-6">
+        <div class="grid grid-cols-2 gap-3 mt-6">
           <button
             @click="fecharModal"
-            class="px-4 py-2 text-white rounded transition w-full bg-blue-500 hover:bg-purple-500"
+            class="px-4 py-3 text-text bg-text/10 rounded-xl transition-all hover:bg-text/20 font-bold"
           >
             Cancelar
           </button>
           <button
             @click="salvarAnotacao"
-            class="px-4 py-2 text-white rounded transition w-full bg-blue-500 hover:bg-purple-500"
+            class="px-4 py-3 text-white bg-primary rounded-xl transition-all hover:opacity-90 shadow-md font-bold"
           >
             Salvar
           </button>

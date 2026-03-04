@@ -4,17 +4,17 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: 'var(--color-primary)',
-        secondary: 'var(--color-secondary)',
-        background: 'var(--color-background)',
-        text: 'var(--color-text)',
-        border: 'var(--color-border)',
-        trabalho: 'var(--color-trabalho)',
-        folga: 'var(--color-folga)'
+        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        text: 'rgb(var(--color-text) / <alpha-value>)',
+        border: 'rgb(var(--color-border) / <alpha-value>)',
+        trabalho: 'rgb(var(--color-trabalho) / <alpha-value>)',
+        folga: 'rgb(var(--color-folga) / <alpha-value>)',
+        card: 'rgb(var(--color-card) / <alpha-value>)',
       }
     },
   },

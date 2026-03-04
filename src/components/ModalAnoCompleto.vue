@@ -61,9 +61,9 @@
                     ? 'var(--color-folga)'
                     : 'transparent',
                 backgroundColor: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                  ? 'rgba(var(--color-trabalho-rgb, 239, 68, 68), 0.15)'
+                  ? 'rgb(var(--color-trabalho) / 0.15)'
                   : scheduleStore.isDiaFolga(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
-                    ? 'rgba(var(--color-folga-rgb, 16, 185, 129), 0.15)'
+                    ? 'rgb(var(--color-folga) / 0.15)'
                     : 'transparent',
                 color: scheduleStore.isDiaTrabalho(new Date(anoSelecionado, mes.numero, dia), dataInicialObj, props.escala)
                   ? 'var(--color-trabalho)'

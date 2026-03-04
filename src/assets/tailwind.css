@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 :root {
-
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -13,77 +12,82 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-
-  --color-primary: #3B82F6;
-  --color-secondary: #8B5CF6;
-  --color-background: #FFFFFF;
-  --color-text: #1F2937;
-  --color-border: #E5E7EB;
-  --color-trabalho: #059669;
-  --color-folga: #DC2626;
+  /* Theme: Light (Default) */
+  --color-primary: 59 130 246;
+  --color-secondary: 139 92 246;
+  --color-background: 255 255 255;
+  --color-text: 31 41 55;
+  --color-border: 229 231 235;
+  --color-trabalho: 5 150 105;
+  --color-folga: 220 38 38;
+  --color-card: 255 255 255;
 }
 
-.dark,
 .theme-dark {
-  --color-primary: #2563EB;
-  --color-primary-rgb: 37, 99, 235;
-  --color-secondary: #1E293B;
-  --color-background: #020617;
-  --color-background-rgb: 2, 6, 23;
-  --color-text: #F8FAFC;
-  --color-text-rgb: 248, 250, 252;
-  --color-border: #1E293B;
-  --color-trabalho: #EF4444;
-  --color-trabalho-rgb: 239, 68, 68;
-  --color-folga: #10B981;
-  --color-folga-rgb: 16, 185, 129;
-  --color-card: #0F172A;
+  --color-primary: 37 99 235;
+  --color-secondary: 30 41 59;
+  --color-background: 17 24 39;
+  --color-text: 255 255 255;
+  --color-border: 55 65 81;
+  --color-trabalho: 248 113 113;
+  --color-folga: 52 211 153;
+  --color-card: 31 41 55;
 }
 
-/* Novos Temas */
+/* Maintain .dark for legacy or global dark parts if needed, alias it to dark variables */
+.dark {
+  --color-primary: 37 99 235;
+  --color-secondary: 30 41 59;
+  --color-background: 17 24 39;
+  --color-text: 255 255 255;
+  --color-border: 55 65 81;
+  --color-trabalho: 248 113 113;
+  --color-folga: 52 211 153;
+  --color-card: 31 41 55;
+}
 
 .theme-ocean {
-  --color-primary: #0EA5E9;
-  --color-secondary: #06B6D4;
-  --color-background: #F0F9FF;
-  --color-text: #0C4A6E;
-  --color-border: #BAE6FD;
-  --color-trabalho: #0891B2;
-  --color-folga: #E11D48;
+  --color-primary: 14 165 233;
+  --color-secondary: 6 182 212;
+  --color-background: 240 249 255;
+  --color-text: 12 74 110;
+  --color-border: 186 230 253;
+  --color-trabalho: 8 145 178;
+  --color-folga: 225 29 72;
+  --color-card: 240 249 255;
 }
 
 .theme-nature {
-  --color-primary: #10B981;
-  --color-secondary: #84CC16;
-  --color-background: #F0FDF4;
-  --color-text: #064E3B;
-  --color-border: #DCFCE7;
-  --color-trabalho: #059669;
-  --color-folga: #B91C1C;
+  --color-primary: 16 185 129;
+  --color-secondary: 132 204 22;
+  --color-background: 240 253 244;
+  --color-text: 6 78 59;
+  --color-border: 220 252 231;
+  --color-trabalho: 5 150 105;
+  --color-folga: 185 28 28;
+  --color-card: 240 253 244;
 }
 
 .theme-sunset {
-  --color-primary: #F59E0B;
-  --color-secondary: #EC4899;
-  --color-background: #FFFBEB;
-  --color-text: #78350F;
-  --color-border: #FEF3C7;
-  --color-trabalho: #D97706;
-  --color-folga: #BE123C;
+  --color-primary: 245 158 11;
+  --color-secondary: 236 72 153;
+  --color-background: 255 251 235;
+  --color-text: 120 53 15;
+  --color-border: 254 243 199;
+  --color-trabalho: 217 119 6;
+  --color-folga: 190 18 60;
+  --color-card: 255 251 235;
 }
 
 .theme-space {
-  --color-primary: #818CF8;
-  --color-secondary: #C084FC;
-  --color-background: #0F172A;
-  --color-text: #F1F5F9;
-  --color-border: #1E293B;
-  --color-trabalho: #4ADE80;
-  --color-folga: #FB7185;
-}
-
-.bg-card {
-  background-color: var(--color-card, var(--color-background));
+  --color-primary: 129 140 248;
+  --color-secondary: 192 132 252;
+  --color-background: 15 23 42;
+  --color-text: 241 245 249;
+  --color-border: 30 41 59;
+  --color-trabalho: 74 222 128;
+  --color-folga: 251 113 133;
+  --color-card: 15 23 42;
 }
 
 a {

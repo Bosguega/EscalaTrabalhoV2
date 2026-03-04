@@ -33,9 +33,9 @@
               : 'transparent',
             backgroundColor: dia.ativo
               ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                ? 'rgba(var(--color-trabalho-rgb, 239, 68, 68), 0.1)'
+                ? 'rgb(var(--color-trabalho) / 0.1)'
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
-                  ? 'rgba(var(--color-folga-rgb, 16, 185, 129), 0.1)'
+                  ? 'rgb(var(--color-folga) / 0.1)'
                   : 'transparent'
               : 'transparent',
             color: dia.ativo
@@ -44,7 +44,7 @@
                 : scheduleStore.isDiaFolga(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
                   ? 'var(--color-folga)'
                   : 'var(--color-text)')
-              : 'rgba(var(--color-text-rgb, 255, 255, 255), 0.2)'
+              : 'rgb(var(--color-text) / 0.2)'
           }"
           @click="abrirModalAnotacoes(dia)"
         >

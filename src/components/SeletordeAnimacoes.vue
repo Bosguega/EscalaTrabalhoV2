@@ -1,6 +1,6 @@
 <template>
-  <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-    <h3 class="text-md font-medium text-gray-800 dark:text-white mb-3">Animações de Transição</h3>
+  <div class="p-4 border-t border-border">
+    <h3 class="text-md font-medium text-text mb-3">Animações de Transição</h3>
     
     <div class="space-y-2">
       <div v-for="animation in animationStore.animations" :key="animation.id" class="flex items-center">
@@ -10,11 +10,11 @@
           :value="animation.id" 
           :checked="selectedAnimationId === animation.id"
           @change="selectedAnimationId = animation.id"
-          class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+          class="w-4 h-4 text-secondary bg-background border-border focus:ring-secondary focus:ring-offset-background"
         >
         <label 
           :for="`animation-${animation.id}`" 
-          class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+          class="ml-2 text-sm font-medium text-text opacity-80 hover:opacity-100 cursor-pointer transition-opacity"
           :title="animation.description"
         >
           {{ animation.name }}
@@ -25,17 +25,17 @@
     <div class="mt-4">
       <button 
         @click="previewAnimation" 
-        class="w-full py-2 px-3 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 dark:bg-gray-700 dark:text-purple-300 dark:hover:bg-gray-600 transition text-sm"
+        class="w-full py-2 px-3 bg-secondary/10 text-secondary rounded hover:bg-secondary/20 transition text-sm font-medium"
       >
         Visualizar Animação
       </button>
     </div>
     
     <!-- Preview da animação -->
-    <div v-if="isPreviewVisible" class="mt-4 p-3 border border-gray-200 dark:border-gray-700 rounded-md">
+    <div v-if="isPreviewVisible" class="mt-4 p-3 border border-border rounded-md bg-background/50">
       <div 
         :class="previewClass" 
-        class="p-2 bg-purple-100 dark:bg-gray-700 rounded text-center text-sm text-purple-700 dark:text-purple-300"
+        class="p-2 bg-secondary/10 rounded text-center text-sm text-secondary font-medium"
       >
         Exemplo de Animação
       </div>

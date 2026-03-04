@@ -3,7 +3,7 @@
       <!-- Overlay para fechar o menu ao clicar fora -->
       <div 
         v-if="aberto" 
-        class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+        class="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
         @click="emit('fechar')" 
       ></div>
       
@@ -16,7 +16,7 @@
           <h2 class="text-lg font-semibold text-text">Menu</h2>
           <button 
             @click="emit('fechar')" 
-            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
+            class="p-2 rounded-full hover:bg-text/10 focus:outline-none transition-colors"
             aria-label="Fechar menu"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -32,7 +32,7 @@
               <!-- Submenu de Temas -->
               <button 
                 @click="toggleSubmenu('temas')"
-                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none transition-colors"
+                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-text/5 focus:outline-none transition-colors"
               >
                 <div class="flex items-center space-x-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,7 +64,7 @@
               <!-- Submenu de Animações -->
               <button 
                 @click="toggleSubmenu('animacoes')"
-                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none transition-colors"
+                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-text/5 focus:outline-none transition-colors"
               >
                 <div class="flex items-center space-x-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,10 +86,10 @@
               <!-- Submenu de Backup -->
               <button 
                 @click="toggleSubmenu('backup')"
-                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none transition-colors"
+                class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-text/5 focus:outline-none transition-colors"
               >
                 <div class="flex items-center space-x-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-text opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                   </svg>
                   <span class="font-semibold text-text">Backup</span>
