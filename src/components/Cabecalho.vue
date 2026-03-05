@@ -9,6 +9,17 @@
         <h1 class="text-lg font-bold tracking-wide">Escala de Trabalho</h1>
       </div>
       <div class="flex items-center gap-2">
+        <!-- Botão de Compartilhar -->
+        <button
+          @click="emitShare"
+          class="p-2 rounded-lg bg-secondary/30 text-text hover:bg-secondary/50 focus:outline-none transition-colors border border-border/30"
+          aria-label="Compartilhar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6a3 3 0 100-2.684m0 2.684l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+        </button>
+
         <!-- Botão de menu -->
         <button
           @click="toggleSidebar"
@@ -26,12 +37,16 @@
   </template>
   
   <script setup lang="ts">
-  const emit = defineEmits(['toggle-sidebar'])
+const emit = defineEmits(['toggle-sidebar', 'share'])
 
-  function toggleSidebar() {
-    emit('toggle-sidebar')
-  }
-  </script>
+function toggleSidebar() {
+  emit('toggle-sidebar')
+}
+
+function emitShare() {
+  emit('share')
+}
+</script>
   
   <style scoped>
   /* Estilos adicionais se quiser */

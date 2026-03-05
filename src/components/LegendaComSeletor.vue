@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col max-w-md mx-auto mt-8 px-4">
-    <h3 class="text-[10px] font-bold text-text opacity-40 uppercase tracking-widest mb-3">Legenda</h3>
+    <h3 class="text-[10px] font-bold text-text opacity-40 uppercase tracking-widest mb-3 group-[.capturing]:hidden">Legenda</h3>
     <div class="flex gap-4">
       <!-- Trabalho -->
       <label class="flex-1 bg-card border border-border rounded-2xl p-4 flex items-center gap-3 cursor-pointer shadow-sm hover:bg-secondary/20 transition-colors">
