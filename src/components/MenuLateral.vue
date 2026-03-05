@@ -82,36 +82,29 @@
               </div>
             </div>
 
-            <div>
-              <!-- Submenu de Backup -->
+              <!-- Submenu de Backup (Modal Trigger) -->
               <button 
-                @click="toggleSubmenu('backup')"
+                @click="abrirBackupMod"
                 class="flex justify-between items-center w-full p-2 rounded-lg hover:bg-text/5 focus:outline-none transition-colors"
               >
                 <div class="flex items-center space-x-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-text opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                   </svg>
-                  <span class="font-semibold text-text">Backup</span>
+                  <span class="font-semibold text-text">Gerenciar Backups</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" :class="{'transform rotate-180': submenus.backup}" class="h-5 w-5 text-text opacity-50 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
               </button>
-              <div v-show="submenus.backup" class="mt-2 pl-4">
-                <MenuBackup />
-              </div>
-            </div>
           </div>
         </div>
       </div>
+      <GerenciarBackup v-model="modalBackupAberto" />
     </div>
 </template>
   
 <script setup lang="ts">
 import { ref } from 'vue'
 import SeletordeAnimacoes from './SeletordeAnimacoes.vue'
-import MenuBackup from './MenuBackup.vue'
+import GerenciarBackup from './GerenciarBackup.vue'
 import { useThemeStore } from '../stores/theme'
 
 const themeStore = useThemeStore()
@@ -124,12 +117,17 @@ const emit = defineEmits(['fechar'])
 // Controle dos submenus
 const submenus = ref({
   temas: false,
-  animacoes: false,
-  backup: false
+  animacoes: false
 })
 
-function toggleSubmenu(menu: 'temas' | 'animacoes' | 'backup') {
+const modalBackupAberto = ref(false)
+
+function toggleSubmenu(menu: 'temas' | 'animacoes') {
   submenus.value[menu] = !submenus.value[menu]
+}
+
+function abrirBackupMod() {
+  modalBackupAberto.value = true
 }
 </script>
   

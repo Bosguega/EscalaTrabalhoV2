@@ -1,44 +1,39 @@
 <template>
-  <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-card text-text border border-border rounded-lg p-6 max-w-md w-full shadow-xl">
-      <!-- Cabeçalho -->
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Anotações - {{ noteStore.formatarData(noteStore.dataSelecionada!) }}</h2>
+  <div v-if="noteStore.modalAberto" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+    <div class="bg-card border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl transform transition-all duration-300 scale-100">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-text tracking-tight">Anotações <span class="text-primary ml-2">{{ noteStore.formatarData(noteStore.dataSelecionada!) }}</span></h2>
         <button
           @click="fecharModal"
-          class="p-2 hover:bg-text/10 rounded-full transition-colors font-medium"
+          class="p-2 hover:bg-secondary/50 rounded-xl text-text opacity-50 hover:opacity-100 transition-all focus:outline-none"
           aria-label="Fechar modal"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <!-- Corpo -->
-      <div class="space-y-4">
+      <div class="space-y-6">
         <div>
-          <label class="block text-sm font-medium mb-1 opacity-70">Sua Anotação</label>
+          <label class="block text-xs font-bold text-text opacity-40 uppercase tracking-widest mb-2">Sua Anotação</label>
           <textarea
             v-model="anotacaoLocal"
-            class="w-full bg-background text-text border border-border rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] transition-all resize-none"
+            class="w-full bg-secondary/10 text-text border border-border rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-primary min-h-[140px] transition-all resize-none shadow-inner custom-scrollbar"
             placeholder="Digite algo para este dia..."
           ></textarea>
         </div>
 
-        <!-- Botões -->
-        <div class="grid grid-cols-2 gap-3 mt-6">
+        <div class="flex flex-col sm:flex-row justify-between gap-4 mt-8">
           <button
             @click="fecharModal"
-            class="px-4 py-3 text-text bg-text/10 rounded-xl transition-all hover:bg-text/20 font-bold"
+            class="w-full py-4 text-text font-bold bg-secondary/20 hover:bg-secondary/40 rounded-2xl transition-all shadow-sm active:scale-95"
           >
             Cancelar
           </button>
           <button
             @click="salvarAnotacao"
-            class="px-4 py-3 text-white bg-primary rounded-xl transition-all hover:opacity-90 shadow-md font-bold"
+            class="w-full py-4 text-white font-bold bg-primary rounded-2xl transition-all hover:opacity-90 shadow-lg active:scale-95"
           >
             Salvar
           </button>
