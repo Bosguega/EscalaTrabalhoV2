@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { carregarDados, atualizarDados } from '../utils/useDadosApp'
+import { formatarDataChave as formatarDataChaveUtil, verificarAnotacao as verificarAnotacaoUtil, carregarAnotacao as carregarAnotacaoUtil } from '../utils/anotacoesUtils.js'
 
 export const useNoteStore = defineStore('note', () => {
   const anotacoes = ref<Record<string, string>>({})
@@ -10,13 +11,7 @@ export const useNoteStore = defineStore('note', () => {
   // Inicialização
   carregarAnotacoes()
 
-  function formatarDataChave(data: Date): string {
-    if (!data) return ''
-    const ano = data.getFullYear()
-    const mes = (data.getMonth() + 1).toString().padStart(2, '0')
-    const dia = data.getDate().toString().padStart(2, '0')
-    return `${ano}-${mes}-${dia}`
-  }
+  const formatarDataChave = (data: Date): string => formatarDataChaveUtil(data)
 
   function formatarData(data: Date): string {
     if (!data) return ''
@@ -69,14 +64,11 @@ export const useNoteStore = defineStore('note', () => {
   }
 
   function verificarAnotacao(data: Date): boolean {
-    const dataFormatada = formatarDataChave(data)
-    return !!anotacoes.value[dataFormatada] &&
-      anotacoes.value[dataFormatada].trim() !== ''
+    return verificarAnotacaoUtil(anotacoes.value, data)
   }
 
   function carregarAnotacao(data: Date): string {
-    const dataFormatada = formatarDataChave(data)
-    return anotacoes.value[dataFormatada] || ''
+    return carregarAnotacaoUtil(anotacoes.value, data)
   }
 
   function abrirModal(data: Date): void {
