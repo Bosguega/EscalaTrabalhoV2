@@ -1,5 +1,6 @@
 import localforage from 'localforage'
 import type { ThemeName } from '../types/theme'
+import { criarFilaSerializada } from './filaSerializada.js'
 
 const STORAGE_KEY = 'appData'
 
@@ -27,16 +28,7 @@ type AtualizacaoDados =
 
 // Todas as operações de escrita passam pela mesma fila. Assim, duas stores
 // não conseguem ler a mesma versão antiga e sobrescrever as alterações uma da outra.
-let filaGravacao: Promise<void> = Promise.resolve()
-
-function executarNaFila<T>(operacao: () => Promise<T>): Promise<T> {
-  const resultado = filaGravacao.then(operacao, operacao)
-  filaGravacao = resultado.then(
-    () => undefined,
-    () => undefined
-  )
-  return resultado
-}
+const executarNaFila = criarFilaSerializada()
 
 // Lê e normaliza os dados sem iniciar outra operação de escrita.
 async function lerDadosPersistidos(): Promise<DadosApp> {
