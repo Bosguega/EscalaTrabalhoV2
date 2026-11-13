@@ -44,12 +44,9 @@ export const useBackupStore = defineStore('backup', () => {
   let criandoBackupAutomatico = false
 
   function lerEscalasPersonalizadas(): string | null {
-    try {
-      return localStorage.getItem(ESCALAS_PERSONALIZADAS_KEY)
-    } catch (error) {
-      console.error('Erro ao ler escalas personalizadas:', error)
-      return null
-    }
+    // Se o navegador bloquear o acesso, falhamos explicitamente em vez de
+    // registrar um backup que depois poderia apagar as escalas na restauração.
+    return localStorage.getItem(ESCALAS_PERSONALIZADAS_KEY)
   }
 
   function aplicarConfiguracoes(configuracoes?: ConfiguracoesBackup): void {
@@ -210,35 +207,56 @@ export const useBackupStore = defineStore('backup', () => {
         throw new Error('Versão dos dados não suportada')
       }
 
+      // Guardamos o estado atual para desfazer uma importação parcialmente aplicada.
+      const dadosAnteriores = await carregarDados()
+      const configuracoesAnteriores = capturarConfiguracoes()
+
       await criarBackup('Backup automático antes da importação')
-      const backupsAnteriores = backups.value
+      const backupsAnteriores = [...backups.value]
 
-      await salvarDados(dadosImportados)
+      try {
+        await salvarDados(dadosImportados)
 
-      if (dados.configuracoes) {
-        aplicarConfiguracoes(dados.configuracoes as ConfiguracoesBackup)
-        await salvarConfiguracaoAutomatica()
-      }
-
-      const backupsUnificados = new Map<number, Backup>()
-      for (const backup of [...dados.backups, ...backupsAnteriores]) {
-        if (
-          backup?.metadata &&
-          typeof backup.metadata.timestamp === 'number' &&
-          backup.dados &&
-          typeof backup.dados === 'object'
-        ) {
-          backupsUnificados.set(backup.metadata.timestamp, backup as Backup)
+        if (dados.configuracoes) {
+          aplicarConfiguracoes(dados.configuracoes as ConfiguracoesBackup)
+          await salvarConfiguracaoAutomatica()
         }
+
+        const backupsUnificados = new Map<number, Backup>()
+        for (const backup of [...dados.backups, ...backupsAnteriores]) {
+          if (
+            backup?.metadata &&
+            typeof backup.metadata.timestamp === 'number' &&
+            backup.dados &&
+            typeof backup.dados === 'object'
+          ) {
+            backupsUnificados.set(backup.metadata.timestamp, backup as Backup)
+          }
+        }
+
+        backups.value = [...backupsUnificados.values()]
+          .sort((a, b) => b.metadata.timestamp - a.metadata.timestamp)
+          .slice(0, LIMITE_BACKUPS)
+
+        await salvarBackups()
+        atualizarUltimoBackup()
+        return true
+      } catch (erroImportacao) {
+        // Se qualquer etapa falhar, tentamos restaurar os dados e preferências
+        // anteriores. O backup de segurança criado acima é mantido.
+        try {
+          await salvarDados(dadosAnteriores)
+          aplicarConfiguracoes(configuracoesAnteriores)
+          await salvarConfiguracaoAutomatica()
+          backups.value = backupsAnteriores
+          await salvarBackups()
+          atualizarUltimoBackup()
+        } catch (erroRestauracao) {
+          console.error('Falha ao reverter importação parcial:', erroRestauracao)
+        }
+
+        throw erroImportacao
       }
-
-      backups.value = [...backupsUnificados.values()]
-        .sort((a, b) => b.metadata.timestamp - a.metadata.timestamp)
-        .slice(0, LIMITE_BACKUPS)
-
-      await salvarBackups()
-      atualizarUltimoBackup()
-      return true
     } catch (error) {
       console.error('Erro ao importar dados:', error)
       return false
