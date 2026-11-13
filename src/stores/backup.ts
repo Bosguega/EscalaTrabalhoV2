@@ -104,7 +104,7 @@ export const useBackupStore = defineStore('backup', () => {
     try {
       const backupsArmazenados = await localforage.getItem<unknown>(BACKUPS_KEY)
       if (Array.isArray(backupsArmazenados)) {
-        backups.value = filtrarBackupsValidos(backupsArmazenados) as Backup[]
+        backups.value = filtrarBackupsValidos<Backup>(backupsArmazenados)
       }
 
       atualizarUltimoBackup()
