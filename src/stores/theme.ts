@@ -6,42 +6,34 @@ import {
   type ThemeName,
   type ThemeColors
 } from '../utils/theme'
-import { carregarDados, salvarDados } from '../utils/useDadosApp'
+import { atualizarDados, carregarDados } from '../utils/useDadosApp'
 
 export const useThemeStore = defineStore('theme', () => {
-  // Estado
   const currentTheme = ref<ThemeName>('dark')
 
-  // Getters
   const isDark = computed(() =>
     availableThemes.find(t => t.name === currentTheme.value)?.dark ?? false
   )
 
-  // Obter objeto de cores (HEX) do tema atual para JS
   const getCurrentTheme = (): ThemeColors => themesColors[currentTheme.value]
 
-  // Actions
   const applyTheme = async () => {
-    if (typeof document === 'undefined') return
-    const root = document.documentElement
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement
 
-    // Remove todos os temas anteriores
-    availableThemes.forEach(t =>
-      root.classList.remove(`theme-${t.name}`)
-    )
+      availableThemes.forEach(t =>
+        root.classList.remove(`theme-${t.name}`)
+      )
 
-    // Adiciona tema atual
-    root.classList.add(`theme-${currentTheme.value}`)
+      root.classList.add(`theme-${currentTheme.value}`)
+      root.classList.toggle('dark', isDark.value)
+    }
 
-    // Sincroniza classe 'dark' para compatibilidade com Tailwind utilities
-    root.classList.toggle('dark', isDark.value)
-
-    // Persistir
     try {
-      const dados = await carregarDados()
-      await salvarDados({ ...dados, tema: currentTheme.value })
+      await atualizarDados({ tema: currentTheme.value })
     } catch (e) {
       console.error('Erro ao salvar tema:', e)
+      throw e
     }
   }
 
@@ -50,8 +42,7 @@ export const useThemeStore = defineStore('theme', () => {
       const dados = await carregarDados()
       if (dados.tema && availableThemes.some(t => t.name === dados.tema)) {
         currentTheme.value = dados.tema
-      } else {
-        // Fallback para sistema
+      } else if (typeof window !== 'undefined') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         currentTheme.value = prefersDark ? 'dark' : 'light'
       }

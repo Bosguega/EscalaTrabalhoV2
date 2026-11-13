@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { carregarDados, salvarDados } from '../utils/useDadosApp'
+import { carregarDados, atualizarDados } from '../utils/useDadosApp'
 
 export const useNoteStore = defineStore('note', () => {
-  // Estado
   const anotacoes = ref<Record<string, string>>({})
   const modalAberto = ref(false)
   const dataSelecionada = ref<Date | null>(null)
@@ -11,7 +10,6 @@ export const useNoteStore = defineStore('note', () => {
   // Inicialização
   carregarAnotacoes()
 
-  // Funções auxiliares
   function formatarDataChave(data: Date): string {
     if (!data) return ''
     const ano = data.getFullYear()
@@ -29,7 +27,6 @@ export const useNoteStore = defineStore('note', () => {
     })
   }
 
-  // Actions
   async function carregarAnotacoes(): Promise<void> {
     try {
       const dados = await carregarDados()
@@ -44,15 +41,30 @@ export const useNoteStore = defineStore('note', () => {
   async function salvarAnotacao(data: Date, texto: string): Promise<void> {
     try {
       const dataFormatada = formatarDataChave(data)
-      anotacoes.value[dataFormatada] = texto
+      const dadosAtualizados = await atualizarDados(dadosAtuais => {
+        let anotacoesAtuais: Record<string, string> = {}
+        if (dadosAtuais.anotacoes) {
+          try {
+            anotacoesAtuais = JSON.parse(dadosAtuais.anotacoes)
+          } catch {
+            anotacoesAtuais = {}
+          }
+        }
 
-      const dados = await carregarDados()
-      await salvarDados({
-        ...dados,
-        anotacoes: JSON.stringify(anotacoes.value)
+        return {
+          anotacoes: JSON.stringify({
+            ...anotacoesAtuais,
+            [dataFormatada]: texto
+          })
+        }
       })
+
+      anotacoes.value = dadosAtualizados.anotacoes
+        ? JSON.parse(dadosAtualizados.anotacoes)
+        : {}
     } catch (error) {
       console.error('Erro ao salvar anotação:', error)
+      throw error
     }
   }
 
@@ -78,16 +90,11 @@ export const useNoteStore = defineStore('note', () => {
   }
 
   return {
-    // Estado
     anotacoes,
     modalAberto,
     dataSelecionada,
-
-    // Getters/Computed
     formatarData,
     verificarAnotacao,
-
-    // Actions
     carregarAnotacoes,
     salvarAnotacao,
     carregarAnotacao,
@@ -95,4 +102,4 @@ export const useNoteStore = defineStore('note', () => {
     fecharModal,
     formatarDataChave
   }
-}) 
+})
