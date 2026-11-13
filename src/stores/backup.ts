@@ -39,6 +39,7 @@ export const useBackupStore = defineStore('backup', () => {
   const intervaloBackup = ref(24 * 60 * 60 * 1000)
 
   let timerBackup: ReturnType<typeof setTimeout> | null = null
+  let inicializacaoPromise: Promise<void> = Promise.resolve()
   let inicializacaoConcluida = false
   let criandoBackupAutomatico = false
 
@@ -129,6 +130,8 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   async function criarBackup(descricao?: string): Promise<void> {
+    await inicializacaoPromise
+    const backupsAnteriores = backups.value
     const dados = await carregarDados()
     const backup: Backup = {
       metadata: {
@@ -148,15 +151,15 @@ export const useBackupStore = defineStore('backup', () => {
       await salvarBackups()
       ultimoBackup.value = new Date(backup.metadata.timestamp)
     } catch (error) {
-      backups.value = backups.value.filter(
-        item => item.metadata.timestamp !== backup.metadata.timestamp
-      )
+      backups.value = backupsAnteriores
+      atualizarUltimoBackup()
       throw error
     }
   }
 
   async function restaurarBackup(timestamp: number): Promise<boolean> {
     try {
+      await inicializacaoPromise
       const backup = backups.value.find(
         item => item.metadata.timestamp === timestamp
       )
@@ -173,6 +176,7 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   async function exportarDados(): Promise<string> {
+    await inicializacaoPromise
     const dados = await carregarDados()
 
     return JSON.stringify({
@@ -185,6 +189,7 @@ export const useBackupStore = defineStore('backup', () => {
 
   async function importarDados(dadosJson: string): Promise<boolean> {
     try {
+      await inicializacaoPromise
       const dados = JSON.parse(dadosJson)
 
       if (
@@ -348,7 +353,7 @@ export const useBackupStore = defineStore('backup', () => {
     agendarBackupAutomatico()
   })
 
-  void inicializar()
+  inicializacaoPromise = inicializar()
   onScopeDispose(pararBackupAutomatico)
 
   return {
