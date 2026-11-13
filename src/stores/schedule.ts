@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { carregarDados, salvarDados } from '../utils/useDadosApp'
+import { carregarDados, atualizarDados } from '../utils/useDadosApp'
 
 export interface ConfiguracaoEscala {
   escala: string
@@ -47,14 +47,12 @@ export const useScheduleStore = defineStore('schedule', () => {
     const diasDoMes: Date[][] = []
     let semanaAtual: Date[] = []
 
-    // Preenche os dias do mês anterior até o primeiro dia do mês atual
     for (let i = 0; i < primeiroDiaDoMes.getDay(); i++) {
       const dia = new Date(primeiroDiaDoMes)
       dia.setDate(dia.getDate() - (primeiroDiaDoMes.getDay() - i))
       semanaAtual.push(dia)
     }
 
-    // Preenche os dias do mês atual
     for (let dia = 1; dia <= ultimoDiaDoMes.getDate(); dia++) {
       const dataAtual = new Date(data.getFullYear(), data.getMonth(), dia)
       semanaAtual.push(dataAtual)
@@ -65,7 +63,6 @@ export const useScheduleStore = defineStore('schedule', () => {
       }
     }
 
-    // Preenche os dias do próximo mês até completar a última semana
     if (semanaAtual.length > 0) {
       const ultimoDia = semanaAtual[semanaAtual.length - 1]
       const diasRestantes = 6 - ultimoDia.getDay()
@@ -129,7 +126,6 @@ export const useScheduleStore = defineStore('schedule', () => {
         }
       }
 
-      // Carregar escalas personalizadas
       const escalasSalvas = localStorage.getItem('escalas_personalizadas')
       if (escalasSalvas) {
         escalasPersonalizadas.value = JSON.parse(escalasSalvas)
@@ -140,12 +136,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   async function salvarConfiguracao(config: ConfiguracaoEscala): Promise<void> {
-    try {
-      const dados = await carregarDados()
-      await salvarDados({ ...dados, escala: JSON.stringify(config) })
-    } catch (error) {
-      console.error('Erro ao salvar configuração:', error)
-    }
+    await atualizarDados({ escala: JSON.stringify(config) })
   }
 
   async function atualizarEscala(novaEscala: string): Promise<void> {
@@ -181,14 +172,10 @@ export const useScheduleStore = defineStore('schedule', () => {
     const novaEscalaValor = `${diasTrabalho}x${diasFolga}`
     const novaEscalaNome = `${diasTrabalho}x${diasFolga} (${diasTrabalho} dias de trabalho, ${diasFolga} de folga)`
 
-    // Verificar se já existe
     const jaExiste = escalasDisponiveis.value.some(e => e.valor === novaEscalaValor)
     if (jaExiste) return
 
-    // Adicionar à lista de escalas personalizadas
     escalasPersonalizadas.value.push({ valor: novaEscalaValor, nome: novaEscalaNome })
-
-    // Salvar no localStorage
     localStorage.setItem('escalas_personalizadas', JSON.stringify(escalasPersonalizadas.value))
   }
 
@@ -198,22 +185,17 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   return {
-    // Estado
     escalaAtual,
     dataInicial,
     escalasPersonalizadas,
     cores,
     escalasDisponiveis,
-
-    // Funções auxiliares
     calcularPadraoEscala,
     isDiaTrabalho,
     isDiaFolga,
     isTrabalho,
     isFolga,
     calcularDiasDoMes,
-
-    // Actions
     carregarConfiguracao,
     salvarConfiguracao,
     atualizarEscala,
@@ -222,4 +204,4 @@ export const useScheduleStore = defineStore('schedule', () => {
     adicionarEscalaPersonalizada,
     removerEscalaPersonalizada
   }
-}) 
+})
