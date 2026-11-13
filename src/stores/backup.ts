@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { onScopeDispose, ref, watch } from 'vue'
 import localforage from 'localforage'
 import { carregarDados, salvarDados, type DadosApp } from '../utils/useDadosApp'
+import { filtrarBackupsValidos, limitarBackups, obterBackupMaisRecente } from '../utils/backupUtils.js'
 
 const BACKUPS_KEY = 'backups'
 const CONFIG_KEY = 'backupConfig'
@@ -103,16 +104,7 @@ export const useBackupStore = defineStore('backup', () => {
     try {
       const backupsArmazenados = await localforage.getItem<unknown>(BACKUPS_KEY)
       if (Array.isArray(backupsArmazenados)) {
-        backups.value = backupsArmazenados.filter((item): item is Backup => {
-          const backup = item as Backup
-          return Boolean(
-            backup &&
-            backup.metadata &&
-            typeof backup.metadata.timestamp === 'number' &&
-            backup.dados &&
-            typeof backup.dados === 'object'
-          )
-        })
+        backups.value = filtrarBackupsValidos(backupsArmazenados) as Backup[]
       }
 
       atualizarUltimoBackup()
@@ -268,14 +260,7 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   function atualizarUltimoBackup(): void {
-    const maisRecente = backups.value.reduce<Backup | null>(
-      (atual, backup) => (
-        !atual || backup.metadata.timestamp > atual.metadata.timestamp
-          ? backup
-          : atual
-      ),
-      null
-    )
+    const maisRecente = obterBackupMaisRecente(backups.value)
 
     ultimoBackup.value = maisRecente
       ? new Date(maisRecente.metadata.timestamp)
@@ -283,9 +268,7 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   async function limparBackupsAntigos(): Promise<void> {
-    const backupsLimitados = [...backups.value]
-      .sort((a, b) => b.metadata.timestamp - a.metadata.timestamp)
-      .slice(0, LIMITE_BACKUPS)
+    const backupsLimitados = limitarBackups(backups.value, LIMITE_BACKUPS)
 
     if (backupsLimitados.length !== backups.value.length) {
       backups.value = backupsLimitados
