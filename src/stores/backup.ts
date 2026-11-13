@@ -123,7 +123,11 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   async function salvarBackups(): Promise<void> {
-    await localforage.setItem(BACKUPS_KEY, backups.value)
+    // O Pinia/ Vue pode envolver os backups em Proxies reativos.
+    // O IndexedDB não consegue clonar esses Proxies; serializamos para
+    // garantir que apenas objetos simples sejam persistidos.
+    const backupsSimples = JSON.parse(JSON.stringify(backups.value)) as Backup[]
+    await localforage.setItem(BACKUPS_KEY, backupsSimples)
   }
 
   async function criarBackup(descricao?: string): Promise<void> {
