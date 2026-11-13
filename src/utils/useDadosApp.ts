@@ -62,9 +62,8 @@ async function lerDadosPersistidos(): Promise<DadosApp> {
 
 export async function carregarDados(): Promise<DadosApp> {
   try {
-    // Aguarda gravações já solicitadas antes de fazer a leitura.
-    await filaGravacao
-    return await lerDadosPersistidos()
+    // Enfileira a leitura após as gravações já solicitadas.
+    return await executarNaFila(() => lerDadosPersistidos())
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
     return { ...dadosPadrao }
