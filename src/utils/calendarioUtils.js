@@ -20,3 +20,29 @@ export function gerarMesesDoAno(ano) {
     }
   })
 }
+
+/**
+ * Move uma data para outro mês sem deixar o JavaScript avançar meses extras
+ * quando o dia original não existe no mês de destino.
+ * Mantém o horário e limita o dia ao último dia do mês de destino.
+ */
+export function ajustarMes(data, quantidade) {
+  const diaOriginal = data.getDate()
+  const novaData = new Date(
+    data.getFullYear(),
+    data.getMonth() + quantidade,
+    1,
+    data.getHours(),
+    data.getMinutes(),
+    data.getSeconds(),
+    data.getMilliseconds()
+  )
+  const ultimoDia = new Date(
+    novaData.getFullYear(),
+    novaData.getMonth() + 1,
+    0
+  ).getDate()
+
+  novaData.setDate(Math.min(diaOriginal, ultimoDia))
+  return novaData
+}

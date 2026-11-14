@@ -45,6 +45,7 @@
   <script setup lang="ts">
   import { computed } from 'vue'
   import { useAnimationStore } from '../stores/animation'
+  import { ajustarMes } from '../utils/calendarioUtils'
   
   const animationStore = useAnimationStore()
   const props = defineProps<{ data: Date }>()

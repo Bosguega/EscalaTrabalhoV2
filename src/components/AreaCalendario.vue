@@ -83,6 +83,7 @@ import Anotacoes from './Anotacoes.vue'
 import { useAnimationStore } from '../stores/animation'
 import { useScheduleStore } from '../stores/schedule'
 import { useNoteStore } from '../stores/note'
+import { ajustarMes } from '../utils/calendarioUtils'
 
 const animationStore = useAnimationStore()
 const scheduleStore = useScheduleStore()
@@ -181,15 +182,11 @@ const emit = defineEmits<{
 }>()
 
 function anterior() {
-  const novaData = new Date(props.data)
-  novaData.setMonth(novaData.getMonth() - 1)
-  emit('update:data', novaData)
+  emit('update:data', ajustarMes(props.data, -1))
 }
 
 function proximo() {
-  const novaData = new Date(props.data)
-  novaData.setMonth(novaData.getMonth() + 1)
-  emit('update:data', novaData)
+  emit('update:data', ajustarMes(props.data, 1))
 }
 
 </script>

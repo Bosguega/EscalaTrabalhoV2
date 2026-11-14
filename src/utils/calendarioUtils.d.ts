@@ -7,3 +7,5 @@ export interface MesCalendario {
 }
 
 export declare function gerarMesesDoAno(ano: number): MesCalendario[]
+
+export declare function ajustarMes(data: Date, quantidade: number): Date
