@@ -59,15 +59,11 @@
   const ano = computed(() => props.data.getFullYear())
   
   function anterior() {
-    const novaData = new Date(props.data)
-    novaData.setMonth(novaData.getMonth() - 1)
-    emit('update:data', novaData)
+    emit('update:data', ajustarMes(props.data, -1))
   }
   
   function proximo() {
-    const novaData = new Date(props.data)
-    novaData.setMonth(novaData.getMonth() + 1)
-    emit('update:data', novaData)
+    emit('update:data', ajustarMes(props.data, 1))
   }
   
   </script>
