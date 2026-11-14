@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Artefatos gerados pelo Vite PWA em desenvolvimento
+dev-dist/
