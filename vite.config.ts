@@ -9,7 +9,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.svg', 'icons/*.png', 'manifest.json'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.svg', 'icons/*.png'],
       strategies: 'generateSW',
       injectRegister: 'auto',
       devOptions: {
