@@ -44,8 +44,9 @@
   
   <script setup lang="ts">
   import { computed } from 'vue'
+  import { useAnimationStore } from '../stores/animation'
   
-
+  const animationStore = useAnimationStore()
   const props = defineProps<{ data: Date }>()
   const emit = defineEmits<{
     (e: 'update:data', value: Date): void

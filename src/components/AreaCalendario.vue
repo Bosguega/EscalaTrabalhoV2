@@ -80,9 +80,11 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import Anotacoes from './Anotacoes.vue'
+import { useAnimationStore } from '../stores/animation'
 import { useScheduleStore } from '../stores/schedule'
 import { useNoteStore } from '../stores/note'
 
+const animationStore = useAnimationStore()
 const scheduleStore = useScheduleStore()
 const noteStore = useNoteStore()
 
