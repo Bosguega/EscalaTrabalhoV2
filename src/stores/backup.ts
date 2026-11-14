@@ -3,6 +3,7 @@ import { onScopeDispose, ref, watch } from 'vue'
 import localforage from 'localforage'
 import { carregarDados, salvarDados, type DadosApp } from '../utils/useDadosApp'
 import { filtrarBackupsValidos, limitarBackups, obterBackupMaisRecente } from '../utils/backupUtils.js'
+import { ehArquivoBackupValido, ehBackupValido, ehConfiguracoesBackupValida } from '../utils/backupValidation.js'
 
 const BACKUPS_KEY = 'backups'
 const CONFIG_KEY = 'backupConfig'
@@ -12,7 +13,7 @@ const INTERVALO_VERIFICACAO = 60 * 60 * 1000
 
 interface BackupMetadata {
   timestamp: number
-  versao: number
+  versao?: number
   descricao?: string
 }
 
@@ -53,17 +54,15 @@ export const useBackupStore = defineStore('backup', () => {
   function aplicarConfiguracoes(configuracoes?: ConfiguracoesBackup): void {
     if (!configuracoes) return
 
-    try {
-      if (configuracoes.escalasPersonalizadas === null) {
-        localStorage.removeItem(ESCALAS_PERSONALIZADAS_KEY)
-      } else if (typeof configuracoes.escalasPersonalizadas === 'string') {
-        localStorage.setItem(
-          ESCALAS_PERSONALIZADAS_KEY,
-          configuracoes.escalasPersonalizadas
-        )
-      }
-    } catch (error) {
-      console.error('Erro ao restaurar escalas personalizadas:', error)
+    // Não ocultamos falhas do localStorage: restauração/importação precisam
+    // detectar o erro para tentar reverter os dados já gravados.
+    if (configuracoes.escalasPersonalizadas === null) {
+      localStorage.removeItem(ESCALAS_PERSONALIZADAS_KEY)
+    } else if (typeof configuracoes.escalasPersonalizadas === 'string') {
+      localStorage.setItem(
+        ESCALAS_PERSONALIZADAS_KEY,
+        configuracoes.escalasPersonalizadas
+      )
     }
 
     if (typeof configuracoes.backupAutomatico === 'boolean') {
@@ -80,11 +79,17 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   function capturarConfiguracoes(): ConfiguracoesBackup {
-    return {
+    const configuracoes = {
       escalasPersonalizadas: lerEscalasPersonalizadas(),
       backupAutomatico: backupAutomatico.value,
       intervaloBackup: intervaloBackup.value
     }
+
+    if (!ehConfiguracoesBackupValida(configuracoes)) {
+      throw new Error('As configurações locais de backup estão inválidas')
+    }
+
+    return configuracoes
   }
 
   async function salvarConfiguracaoAutomatica(): Promise<void> {
@@ -93,11 +98,7 @@ export const useBackupStore = defineStore('backup', () => {
       intervaloBackup: intervaloBackup.value
     }
 
-    try {
-      await localforage.setItem(CONFIG_KEY, configuracao)
-    } catch (error) {
-      console.error('Erro ao salvar configurações de backup:', error)
-    }
+    await localforage.setItem(CONFIG_KEY, configuracao)
   }
 
   async function carregarBackups(): Promise<void> {
@@ -105,6 +106,14 @@ export const useBackupStore = defineStore('backup', () => {
       const backupsArmazenados = await localforage.getItem<unknown>(BACKUPS_KEY)
       if (Array.isArray(backupsArmazenados)) {
         backups.value = filtrarBackupsValidos<Backup>(backupsArmazenados)
+
+        // Persiste a limpeza de registros corrompidos ou incompatíveis.
+        if (backups.value.length !== backupsArmazenados.length) {
+          await salvarBackups()
+        }
+      } else if (backupsArmazenados !== null) {
+        backups.value = []
+        await salvarBackups()
       }
 
       atualizarUltimoBackup()
@@ -156,12 +165,28 @@ export const useBackupStore = defineStore('backup', () => {
       const backup = backups.value.find(
         item => item.metadata.timestamp === timestamp
       )
-      if (!backup) return false
+      if (!backup || !ehBackupValido(backup)) return false
 
-      await salvarDados(backup.dados)
-      aplicarConfiguracoes(backup.configuracoes)
-      await salvarConfiguracaoAutomatica()
-      return true
+      const dadosAnteriores = await carregarDados()
+      const configuracoesAnteriores = capturarConfiguracoes()
+
+      try {
+        await salvarDados(backup.dados)
+        aplicarConfiguracoes(backup.configuracoes)
+        await salvarConfiguracaoAutomatica()
+        return true
+      } catch (erroRestauracao) {
+        // Se as preferências falharem depois da gravação principal, tentamos
+        // devolver dados e configurações ao estado anterior.
+        try {
+          await salvarDados(dadosAnteriores)
+          aplicarConfiguracoes(configuracoesAnteriores)
+          await salvarConfiguracaoAutomatica()
+        } catch (erroReversao) {
+          console.error('Falha ao reverter restauração parcial:', erroReversao)
+        }
+        throw erroRestauracao
+      }
     } catch (error) {
       console.error('Erro ao restaurar backup:', error)
       return false
@@ -185,25 +210,15 @@ export const useBackupStore = defineStore('backup', () => {
       await inicializacaoPromise
       const dados = JSON.parse(dadosJson)
 
-      if (
-        !dados ||
-        !dados.dados ||
-        typeof dados.dados !== 'object' ||
-        !Array.isArray(dados.backups) ||
-        typeof dados.timestamp !== 'number'
-      ) {
-        throw new Error('Formato de dados inválido')
+      if (!ehArquivoBackupValido(dados)) {
+        throw new Error('Arquivo de backup inválido ou incompatível')
       }
 
       const dadosImportados = dados.dados as DadosApp
-      if (
-        typeof dadosImportados.versao !== 'number' ||
-        ![1, 2].includes(dadosImportados.versao)
-      ) {
-        throw new Error('Versão dos dados não suportada')
-      }
+      // Registros históricos inválidos são descartados individualmente; os
+      // dados principais só são aplicados se o envelope inteiro for válido.
+      const backupsImportados = filtrarBackupsValidos<Backup>(dados.backups)
 
-      // Guardamos o estado atual para desfazer uma importação parcialmente aplicada.
       const dadosAnteriores = await carregarDados()
       const configuracoesAnteriores = capturarConfiguracoes()
 
@@ -219,15 +234,8 @@ export const useBackupStore = defineStore('backup', () => {
         }
 
         const backupsUnificados = new Map<number, Backup>()
-        for (const backup of [...dados.backups, ...backupsAnteriores]) {
-          if (
-            backup?.metadata &&
-            typeof backup.metadata.timestamp === 'number' &&
-            backup.dados &&
-            typeof backup.dados === 'object'
-          ) {
-            backupsUnificados.set(backup.metadata.timestamp, backup as Backup)
-          }
+        for (const backup of [...backupsImportados, ...backupsAnteriores]) {
+          backupsUnificados.set(backup.metadata.timestamp, backup)
         }
 
         backups.value = [...backupsUnificados.values()]
@@ -238,8 +246,7 @@ export const useBackupStore = defineStore('backup', () => {
         atualizarUltimoBackup()
         return true
       } catch (erroImportacao) {
-        // Se qualquer etapa falhar, tentamos restaurar os dados e preferências
-        // anteriores. O backup de segurança criado acima é mantido.
+        // Mantemos o backup de segurança criado antes da importação.
         try {
           await salvarDados(dadosAnteriores)
           aplicarConfiguracoes(configuracoesAnteriores)
@@ -348,13 +355,21 @@ export const useBackupStore = defineStore('backup', () => {
 
   watch(backupAutomatico, async () => {
     if (!inicializacaoConcluida) return
-    await salvarConfiguracaoAutomatica()
+    try {
+      await salvarConfiguracaoAutomatica()
+    } catch (error) {
+      console.error('Erro ao salvar configurações de backup:', error)
+    }
     agendarBackupAutomatico()
   })
 
   watch(intervaloBackup, async () => {
     if (!inicializacaoConcluida) return
-    await salvarConfiguracaoAutomatica()
+    try {
+      await salvarConfiguracaoAutomatica()
+    } catch (error) {
+      console.error('Erro ao salvar configurações de backup:', error)
+    }
     agendarBackupAutomatico()
   })
 
