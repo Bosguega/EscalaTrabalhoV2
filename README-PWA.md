@@ -1,55 +1,50 @@
-# Escala de Trabalho - PWA
+# PWA — Escala de Trabalho
 
-## Sobre o PWA
+O projeto contém configuração de Progressive Web App (PWA), incluindo manifesto, ícones e Service Worker. Isso permite oferecer instalação pelo navegador e preparar os recursos necessários para uso offline.
 
-Este aplicativo foi configurado como um Progressive Web App (PWA), o que significa que você pode instalá-lo em seu dispositivo e usá-lo offline, como se fosse um aplicativo nativo.
+## Instalação
 
-## Recursos do PWA
+A instalação depende do navegador e do dispositivo. Em geral:
 
-- **Instalável**: Adicione o aplicativo à tela inicial do seu dispositivo
-- **Offline**: Continue usando o aplicativo mesmo sem conexão com a internet
-- **Rápido**: Carregamento mais rápido após a primeira visita
-- **Atualizado**: Receba atualizações automaticamente
+### Desktop (Chrome ou Edge)
 
-## Como instalar
+1. Abra o endereço publicado do aplicativo.
+2. Use a opção **Instalar aplicativo** exibida na barra de endereço ou no menu do navegador.
+3. Confirme a instalação.
 
-### No Desktop (Chrome, Edge, etc.)
+### Android (Chrome)
 
-1. Acesse o site do aplicativo
-2. Clique no ícone de instalação na barra de endereço (geralmente um símbolo "+" ou ícone de computador)
-3. Clique em "Instalar"
+1. Abra o endereço do aplicativo no Chrome.
+2. Abra o menu do navegador.
+3. Selecione **Instalar app** ou **Adicionar à tela inicial**, conforme a opção apresentada.
 
-### No Android
+### iPhone e iPad (Safari)
 
-1. Acesse o site do aplicativo no Chrome
-2. Toque no banner "Adicionar à tela inicial" ou no menu (três pontos) e selecione "Adicionar à tela inicial"
-3. Confirme a instalação
+1. Abra o endereço do aplicativo no Safari.
+2. Toque em **Compartilhar**.
+3. Selecione **Adicionar à Tela de Início**.
 
-### No iOS (iPhone/iPad)
+Os nomes e a disponibilidade dessas opções variam conforme a versão do navegador e do sistema.
 
-1. Acesse o site do aplicativo no Safari
-2. Toque no botão de compartilhamento (ícone de quadrado com seta para cima)
-3. Role para baixo e toque em "Adicionar à Tela de Início"
-4. Confirme a instalação
+## Dados e funcionamento offline
 
-## Funcionalidades Offline
+- Os dados do aplicativo são armazenados localmente no navegador.
+- Não existe sincronização automática com servidor ou entre dispositivos.
+- A instalação do PWA não substitui a exportação de dados nem os backups.
+- O uso offline depende de o Service Worker ter sido instalado e de os recursos necessários terem sido armazenados em cache após o acesso online.
 
-Quando estiver offline, você ainda poderá:
+**Limitação conhecida:** a configuração do PWA e o registro do Service Worker estão passando por uma revisão técnica. Até essa revisão ser concluída e testada, não conte com o funcionamento offline como única forma de acesso aos seus dados.
 
-- Visualizar sua escala de trabalho
-- Ver e editar anotações
-- Alternar entre temas claro e escuro
+## Proteção dos dados
 
-As alterações feitas offline serão sincronizadas quando você voltar a ficar online.
+Antes de limpar os dados do navegador, trocar de dispositivo ou reinstalar o aplicativo, faça uma exportação ou confirme que possui um backup válido. Limpar os dados do site pode remover informações armazenadas localmente.
 
-## Solução de Problemas
+## Solução de problemas
 
-Se encontrar problemas com o aplicativo:
+Se a instalação ou a abertura do aplicativo apresentar problemas:
 
-1. Certifique-se de que está usando a versão mais recente do navegador
-2. Tente limpar o cache do navegador
-3. Desinstale e reinstale o aplicativo
+1. Confirme que está usando uma versão atualizada do navegador.
+2. Abra o aplicativo com conexão à internet.
+3. Verifique se há uma atualização disponível e tente abrir novamente.
+4. Evite limpar os dados do site antes de exportar ou proteger suas informações.
 
-## Feedback
-
-Se tiver sugestões ou encontrar problemas, entre em contato com o desenvolvedor.
