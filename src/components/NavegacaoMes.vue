@@ -43,11 +43,9 @@
   </template>
   
   <script setup lang="ts">
-  import { computed, onMounted } from 'vue'
-  import { useAnimationStore } from '../stores/animation'
+  import { computed } from 'vue'
   
-  const animationStore = useAnimationStore()
-  
+
   const props = defineProps<{ data: Date }>()
   const emit = defineEmits<{
     (e: 'update:data', value: Date): void
@@ -70,9 +68,5 @@
     emit('update:data', novaData)
   }
   
-  // Carregar preferência de animação ao montar o componente
-  onMounted(() => {
-    animationStore.loadAnimationPreference()
-  })
   </script>
   
