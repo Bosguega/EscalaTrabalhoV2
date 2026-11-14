@@ -42,7 +42,7 @@ test('completa cada mês com exatamente 42 posições de calendário', () => {
 
   for (const mes of meses) {
     assert.ok(mes.diasAntes >= 0 && mes.diasAntes <= 6)
-    assert.ok(mes.diasDepois >= 0 && mes.diasDepois <= 6)
+    assert.ok(mes.diasDepois >= 0 && mes.diasDepois <= 14)
     assert.equal(mes.diasAntes + mes.dias.length + mes.diasDepois, 42)
   }
 })
