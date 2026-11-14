@@ -9,7 +9,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.svg', 'icons/*.png'],
+      includeAssets: ['icons/*.svg', 'icons/*.png'],
       strategies: 'generateSW',
       injectRegister: 'auto',
       devOptions: {
@@ -39,7 +39,7 @@ export default defineConfig({
         short_name: 'Escala',
         description: 'Aplicativo de gerenciamento de escala de trabalho',
         theme_color: '#3b82f6',
-        start_url: '/',
+        start_url: './',
         display: 'standalone',
         background_color: '#ffffff',
         icons: [
