@@ -7,7 +7,13 @@ import {
   obterBackupMaisRecente
 } from '../src/utils/backupUtils.js'
 
-function criarBackup(timestamp, dados = { escala: '2x2' }) {
+function criarBackup(timestamp, dados = {
+  versao: 2,
+  escala: null,
+  anotacoes: null,
+  animacao: null,
+  tema: null
+}) {
   return { metadata: { timestamp }, dados }
 }
 
@@ -19,7 +25,9 @@ test('rejeita estruturas incompletas ou com timestamp inválido', () => {
   assert.equal(ehBackupValido(null), false)
   assert.equal(ehBackupValido({ metadata: {}, dados: {} }), false)
   assert.equal(ehBackupValido({ metadata: { timestamp: '100' }, dados: {} }), false)
+  assert.equal(ehBackupValido({ metadata: { timestamp: Infinity }, dados: { versao: 2 } }), false)
   assert.equal(ehBackupValido({ metadata: { timestamp: 100 } }), false)
+  assert.equal(ehBackupValido({ metadata: { timestamp: 100 }, dados: { versao: 99 } }), false)
 })
 
 test('filtra entradas inválidas sem descartar backups válidos', () => {

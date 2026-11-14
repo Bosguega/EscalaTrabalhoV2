@@ -12,7 +12,7 @@ const INTERVALO_VERIFICACAO = 60 * 60 * 1000
 
 interface BackupMetadata {
   timestamp: number
-  versao: number
+  versao?: number
   descricao?: string
 }
 
@@ -93,11 +93,7 @@ export const useBackupStore = defineStore('backup', () => {
       intervaloBackup: intervaloBackup.value
     }
 
-    try {
-      await localforage.setItem(CONFIG_KEY, configuracao)
-    } catch (error) {
-      console.error('Erro ao salvar configurações de backup:', error)
-    }
+    await localforage.setItem(CONFIG_KEY, configuracao)
   }
 
   async function carregarBackups(): Promise<void> {
@@ -105,6 +101,14 @@ export const useBackupStore = defineStore('backup', () => {
       const backupsArmazenados = await localforage.getItem<unknown>(BACKUPS_KEY)
       if (Array.isArray(backupsArmazenados)) {
         backups.value = filtrarBackupsValidos<Backup>(backupsArmazenados)
+
+        // Persiste a limpeza de registros corrompidos ou incompatíveis.
+        if (backups.value.length !== backupsArmazenados.length) {
+          await salvarBackups()
+        }
+      } else if (backupsArmazenados !== null) {
+        backups.value = []
+        await salvarBackups()
       }
 
       atualizarUltimoBackup()
@@ -348,13 +352,21 @@ export const useBackupStore = defineStore('backup', () => {
 
   watch(backupAutomatico, async () => {
     if (!inicializacaoConcluida) return
-    await salvarConfiguracaoAutomatica()
+    try {
+      await salvarConfiguracaoAutomatica()
+    } catch (error) {
+      console.error('Erro ao salvar configurações de backup:', error)
+    }
     agendarBackupAutomatico()
   })
 
   watch(intervaloBackup, async () => {
     if (!inicializacaoConcluida) return
-    await salvarConfiguracaoAutomatica()
+    try {
+      await salvarConfiguracaoAutomatica()
+    } catch (error) {
+      console.error('Erro ao salvar configurações de backup:', error)
+    }
     agendarBackupAutomatico()
   })
 

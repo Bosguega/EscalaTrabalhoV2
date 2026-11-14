@@ -1,13 +1,6 @@
-export function ehBackupValido(item) {
-  return Boolean(
-    item &&
-    typeof item === 'object' &&
-    item.metadata &&
-    typeof item.metadata.timestamp === 'number' &&
-    item.dados &&
-    typeof item.dados === 'object'
-  )
-}
+import { ehBackupValido } from './backupValidation.js'
+
+export { ehBackupValido }
 
 export function filtrarBackupsValidos(backups) {
   return Array.isArray(backups) ? backups.filter(ehBackupValido) : []
