@@ -35,6 +35,7 @@ import AreaCalendario from './components/AreaCalendario.vue'
 import LegendaComSeletor from './components/LegendaComSeletor.vue'
 import MenuLateral from './components/MenuLateral.vue'
 import { useThemeStore } from './stores/theme'
+import { useAnimationStore } from './stores/animation'
 import { useScheduleStore } from './stores/schedule'
 import html2canvas from 'html2canvas'
 
@@ -47,10 +48,14 @@ const isCapturing = ref(false)
 // Inicializar stores
 const themeStore = useThemeStore()
 const scheduleStore = useScheduleStore()
+const animationStore = useAnimationStore()
 
 onMounted(async () => {
-  // Carrega as preferências de tema
-  await themeStore.loadThemePreference()
+  // Carrega as preferências persistidas
+  await Promise.all([
+    themeStore.loadThemePreference(),
+    animationStore.loadAnimationPreference()
+  ])
   
   // Carrega as configurações da escala
   await scheduleStore.carregarConfiguracao()

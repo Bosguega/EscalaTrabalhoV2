@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useAnimationStore } from '../stores/animation'
 
 const animationStore = useAnimationStore()
@@ -74,10 +74,6 @@ function previewAnimation() {
   }, 10)
 }
 
-// Carregar preferência de animação ao montar o componente
-onMounted(() => {
-  animationStore.loadAnimationPreference()
-})
 </script>
 
 <style>

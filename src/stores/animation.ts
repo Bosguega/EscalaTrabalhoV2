@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { carregarDados, salvarDados } from '../utils/useDadosApp'
+import { atualizarDados, carregarDados } from '../utils/useDadosApp'
 
 // Interface para definir a estrutura de uma animação
 export interface Animation {
@@ -67,8 +67,7 @@ export const useAnimationStore = defineStore('animation', () => {
       selectedAnimation.value = animation
       // Salvar preferência do usuário
       try {
-        const dados = await carregarDados()
-        await salvarDados({ ...dados, animacao: id })
+        await atualizarDados({ animacao: id })
       } catch (error) {
         console.error('Erro ao salvar animação:', error)
       }
@@ -79,8 +78,9 @@ export const useAnimationStore = defineStore('animation', () => {
   async function loadAnimationPreference(): Promise<void> {
     try {
       const dados = await carregarDados()
-      if (dados.animacao) {
-        selectAnimation(dados.animacao)
+      const animation = animations.find(anim => anim.id === dados.animacao)
+      if (animation) {
+        selectedAnimation.value = animation
       }
     } catch (error) {
       console.error('Erro ao carregar animação:', error)
