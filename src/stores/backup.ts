@@ -54,17 +54,15 @@ export const useBackupStore = defineStore('backup', () => {
   function aplicarConfiguracoes(configuracoes?: ConfiguracoesBackup): void {
     if (!configuracoes) return
 
-    try {
-      if (configuracoes.escalasPersonalizadas === null) {
-        localStorage.removeItem(ESCALAS_PERSONALIZADAS_KEY)
-      } else if (typeof configuracoes.escalasPersonalizadas === 'string') {
-        localStorage.setItem(
-          ESCALAS_PERSONALIZADAS_KEY,
-          configuracoes.escalasPersonalizadas
-        )
-      }
-    } catch (error) {
-      console.error('Erro ao restaurar escalas personalizadas:', error)
+    // Não ocultamos falhas do localStorage: restauração/importação precisam
+    // detectar o erro para tentar reverter os dados já gravados.
+    if (configuracoes.escalasPersonalizadas === null) {
+      localStorage.removeItem(ESCALAS_PERSONALIZADAS_KEY)
+    } else if (typeof configuracoes.escalasPersonalizadas === 'string') {
+      localStorage.setItem(
+        ESCALAS_PERSONALIZADAS_KEY,
+        configuracoes.escalasPersonalizadas
+      )
     }
 
     if (typeof configuracoes.backupAutomatico === 'boolean') {
