@@ -53,9 +53,46 @@ As configurações, anotações e preferências são armazenadas localmente no n
 
 O armazenamento do navegador pode ser apagado pelo próprio usuário, pelo navegador ou ao limpar os dados do site. Faça exportações ou mantenha backups atualizados para proteger suas informações.
 
-## PWA e instalação
+## Instalação como aplicativo (PWA)
 
-O projeto inclui configuração de Progressive Web App (PWA), com manifesto e recursos de instalação. Consulte [README-PWA.md](README-PWA.md) para as orientações e limitações conhecidas do funcionamento offline.
+O projeto inclui configuração de Progressive Web App (PWA), com manifesto, ícones e recursos para instalação pelo navegador. A instalação depende do navegador e do dispositivo.
+
+### Desktop (Chrome ou Edge)
+
+1. Abra o endereço publicado do aplicativo.
+2. Use a opção **Instalar aplicativo** exibida na barra de endereço ou no menu do navegador.
+3. Confirme a instalação.
+
+### Android (Chrome)
+
+1. Abra o endereço do aplicativo no Chrome.
+2. Abra o menu do navegador.
+3. Selecione **Instalar app** ou **Adicionar à tela inicial**, conforme a opção apresentada.
+
+### iPhone e iPad (Safari)
+
+1. Abra o endereço do aplicativo no Safari.
+2. Toque em **Compartilhar**.
+3. Selecione **Adicionar à Tela de Início**.
+
+Os nomes e a disponibilidade dessas opções variam conforme a versão do navegador e do sistema.
+
+### Funcionamento offline e limitações
+
+- A instalação do PWA não substitui a exportação de dados nem os backups.
+- O uso offline depende de o Service Worker ter sido instalado e de os recursos necessários terem sido armazenados em cache após o acesso online.
+- Os dados continuam armazenados localmente no navegador; não existe sincronização automática com servidor ou entre dispositivos.
+
+**Limitação conhecida:** a configuração do PWA e o registro do Service Worker estão passando por uma revisão técnica. Até essa revisão ser concluída e testada, não conte com o funcionamento offline como única forma de acesso aos seus dados.
+
+### Solução de problemas
+
+Se a instalação ou a abertura do aplicativo apresentar problemas:
+
+1. Confirme que está usando uma versão atualizada do navegador.
+2. Abra o aplicativo com conexão à internet.
+3. Verifique se há uma atualização disponível e tente abrir novamente.
+4. Evite limpar os dados do site antes de exportar ou proteger suas informações.
 
 ## Estrutura geral
 
