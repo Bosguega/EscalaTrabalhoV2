@@ -3,7 +3,7 @@ import { onScopeDispose, ref, watch } from 'vue'
 import localforage from 'localforage'
 import { carregarDados, salvarDados, type DadosApp } from '../utils/useDadosApp'
 import { filtrarBackupsValidos, limitarBackups, obterBackupMaisRecente } from '../utils/backupUtils.js'
-import { ehArquivoBackupValido, ehBackupValido } from '../utils/backupValidation.js'
+import { ehArquivoBackupValido, ehBackupValido, ehConfiguracoesBackupValida } from '../utils/backupValidation.js'
 
 const BACKUPS_KEY = 'backups'
 const CONFIG_KEY = 'backupConfig'
@@ -79,11 +79,17 @@ export const useBackupStore = defineStore('backup', () => {
   }
 
   function capturarConfiguracoes(): ConfiguracoesBackup {
-    return {
+    const configuracoes = {
       escalasPersonalizadas: lerEscalasPersonalizadas(),
       backupAutomatico: backupAutomatico.value,
       intervaloBackup: intervaloBackup.value
     }
+
+    if (!ehConfiguracoesBackupValida(configuracoes)) {
+      throw new Error('As configurações locais de backup estão inválidas')
+    }
+
+    return configuracoes
   }
 
   async function salvarConfiguracaoAutomatica(): Promise<void> {
