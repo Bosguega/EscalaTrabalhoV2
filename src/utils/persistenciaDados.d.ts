@@ -15,5 +15,4 @@ export declare function criarPersistenciaDados<T extends { versao: number }>(
   carregarDados(): Promise<T>
   salvarDados(dados: T): Promise<void>
   atualizarDados(atualizacao: AtualizacaoPersistencia<T>): Promise<T>
-  resetarDados(): Promise<void>
 }
