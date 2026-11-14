@@ -74,16 +74,9 @@ export function criarPersistenciaDados(storage, storageKey, dadosPadrao) {
     })
   }
 
-  async function resetarDados() {
-    return executarNaFila(async () => {
-      await storage.setItem(storageKey, { ...dadosPadrao })
-    })
-  }
-
   return {
     carregarDados,
     salvarDados,
-    atualizarDados,
-    resetarDados
+    atualizarDados
   }
 }

@@ -40,16 +40,6 @@ export const useScheduleStore = defineStore('schedule', () => {
   // Getters
   const escalasDisponiveis = computed(() => [...escalasFixas, ...escalasPersonalizadas.value])
 
-  // Funções de cálculo puras, compartilhadas com os testes automatizados.
-  // Mantemos os métodos na store para não alterar a API usada pelos componentes.
-  function isTrabalho(ano: number, mes: number, dia: number, dataInicialParam: Date, escalaParam: string): boolean {
-    return isDiaTrabalho(new Date(ano, mes, dia), dataInicialParam, escalaParam)
-  }
-
-  function isFolga(ano: number, mes: number, dia: number, dataInicialParam: Date, escalaParam: string): boolean {
-    return !isTrabalho(ano, mes, dia, dataInicialParam, escalaParam)
-  }
-
   // Actions
   async function carregarConfiguracao(): Promise<void> {
     try {
@@ -133,8 +123,6 @@ export const useScheduleStore = defineStore('schedule', () => {
     calcularPadraoEscala,
     isDiaTrabalho,
     isDiaFolga,
-    isTrabalho,
-    isFolga,
     calcularDiasDoMes,
     carregarConfiguracao,
     salvarConfiguracao,

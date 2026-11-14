@@ -24,7 +24,6 @@
             <select
               v-model="escalaLocal"
               class="w-full bg-secondary/30 text-text border border-border rounded-2xl py-4 px-4 text-base focus:outline-none focus:ring-2 focus:ring-primary appearance-none transition-all"
-              @change="mostrarOpcoesCriarRemover = false"
             >
               <option value="" disabled class="bg-card">Selecione uma escala</option>
               <option v-for="escala in escalasDisponiveis" :key="escala.valor" :value="escala.valor" class="bg-card">
@@ -165,7 +164,6 @@ const dataInicialLocal = ref(
     ? new Date(props.dataInicial).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10)
 )
-const mostrarOpcoesCriarRemover = ref(false)
 const novaEscalaDiasTrabalho = ref(1)
 const novaEscalaDiasFolga = ref(1)
 const escalaParaRemover = ref('')

@@ -25,4 +25,3 @@ const persistencia = criarPersistenciaDados(localforage, 'appData', dadosPadrao)
 export const carregarDados = persistencia.carregarDados
 export const salvarDados = persistencia.salvarDados
 export const atualizarDados = persistencia.atualizarDados
-export const resetarDados = persistencia.resetarDados
