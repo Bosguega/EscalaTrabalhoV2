@@ -56,3 +56,53 @@ test('não compartilha ou altera listas de dias entre meses', () => {
   assert.deepEqual(meses[1].dias, diasFevereiro)
   assert.equal(meses[1].dias.length, 28)
 })
+
+
+test('navega de janeiro para fevereiro sem saltar para março', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const resultado = ajustarMes(new Date(2025, 0, 31), 1)
+  assert.equal(resultado.getFullYear(), 2025)
+  assert.equal(resultado.getMonth(), 1)
+  assert.equal(resultado.getDate(), 28)
+})
+
+test('navega de janeiro para dezembro ao voltar um mês', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const resultado = ajustarMes(new Date(2025, 0, 31), -1)
+  assert.equal(resultado.getFullYear(), 2024)
+  assert.equal(resultado.getMonth(), 11)
+  assert.equal(resultado.getDate(), 31)
+})
+
+test('limita o dia ao último dia do mês ao voltar de março', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const resultado = ajustarMes(new Date(2025, 2, 31), -1)
+  assert.equal(resultado.getMonth(), 1)
+  assert.equal(resultado.getDate(), 28)
+})
+
+test('mantém o dia quando ele existe no mês de destino', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const resultado = ajustarMes(new Date(2025, 1, 28), 1)
+  assert.equal(resultado.getMonth(), 2)
+  assert.equal(resultado.getDate(), 28)
+})
+
+test('respeita fevereiro em ano bissexto', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const resultado = ajustarMes(new Date(2024, 1, 29), 1)
+  assert.equal(resultado.getMonth(), 2)
+  assert.equal(resultado.getDate(), 29)
+})
+
+test('preserva horário e não modifica a data original', async () => {
+  const { ajustarMes } = await import('../src/utils/calendarioUtils.js')
+  const original = new Date(2025, 0, 31, 14, 35, 42, 123)
+  const resultado = ajustarMes(original, 1)
+  assert.equal(original.getMonth(), 0)
+  assert.equal(original.getDate(), 31)
+  assert.equal(resultado.getHours(), 14)
+  assert.equal(resultado.getMinutes(), 35)
+  assert.equal(resultado.getSeconds(), 42)
+  assert.equal(resultado.getMilliseconds(), 123)
+})

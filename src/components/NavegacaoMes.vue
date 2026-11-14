@@ -45,6 +45,7 @@
   <script setup lang="ts">
   import { computed } from 'vue'
   import { useAnimationStore } from '../stores/animation'
+  import { ajustarMes } from '../utils/calendarioUtils'
   
   const animationStore = useAnimationStore()
   const props = defineProps<{ data: Date }>()
@@ -58,15 +59,11 @@
   const ano = computed(() => props.data.getFullYear())
   
   function anterior() {
-    const novaData = new Date(props.data)
-    novaData.setMonth(novaData.getMonth() - 1)
-    emit('update:data', novaData)
+    emit('update:data', ajustarMes(props.data, -1))
   }
   
   function proximo() {
-    const novaData = new Date(props.data)
-    novaData.setMonth(novaData.getMonth() + 1)
-    emit('update:data', novaData)
+    emit('update:data', ajustarMes(props.data, 1))
   }
   
   </script>
