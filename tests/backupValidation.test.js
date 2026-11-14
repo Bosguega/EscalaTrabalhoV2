@@ -37,6 +37,8 @@ test('rejeita versão, campos e tema incompatíveis', () => {
   assert.equal(ehDadosAppValido({ ...dados, versao: 99 }), false)
   assert.equal(ehDadosAppValido({ ...dados, escala: {} }), false)
   assert.equal(ehDadosAppValido({ ...dados, tema: 'tema-inexistente' }), false)
+  assert.equal(ehDadosAppValido({ versao: 2 }), false)
+  assert.equal(ehDadosAppValido({ versao: 1, escala: 'legado' }), true)
   assert.equal(ehDadosAppValido([]), false)
 })
 

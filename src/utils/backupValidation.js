@@ -14,7 +14,11 @@ export function ehDadosAppValido(dados) {
     return false
   }
 
+  const camposDados = ['escala', 'anotacoes', 'animacao', 'tema']
   if (
+    (dados.versao === 2 && !camposDados.every(campo =>
+      Object.prototype.hasOwnProperty.call(dados, campo)
+    )) ||
     !ehStringOpcional(dados.escala) ||
     !ehStringOpcional(dados.anotacoes) ||
     !ehStringOpcional(dados.animacao) ||
