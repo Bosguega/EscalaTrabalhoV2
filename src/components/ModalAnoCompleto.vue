@@ -100,6 +100,7 @@ import { computed, ref, watch } from 'vue'
 import { useScheduleStore } from '../stores/schedule'
 import { useNoteStore } from '../stores/note'
 import Anotacoes from './Anotacoes.vue'
+import { gerarMesesDoAno } from '../utils/calendarioUtils'
 
 const props = defineProps<{
   modelValue: boolean
@@ -165,22 +166,5 @@ const anosDisponiveis = computed(() => {
   return anos
 })
 
-const meses = computed(() => {
-  return Array.from({ length: 12 }, (_, i) => {
-    const data = new Date(anoSelecionado.value, i, 1)
-    const diasAntes = data.getDay()
-    const ultimoDia = new Date(anoSelecionado.value, i + 1, 0)
-    const totalDias = ultimoDia.getDate()
-    const diasDepois = 42 - (diasAntes + totalDias)
-    const dias = Array.from({ length: totalDias }, (_, i) => i + 1)
-
-    return {
-      numero: i,
-      nome: data.toLocaleDateString('pt-BR', { month: 'long' }).replace(/^./, m => m.toUpperCase()),
-      dias,
-      diasAntes,
-      diasDepois
-    }
-  })
-})
+const meses = computed(() => gerarMesesDoAno(anoSelecionado.value))
 </script>
