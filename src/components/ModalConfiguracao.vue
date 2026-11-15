@@ -190,7 +190,7 @@ function bloquearEntradaNaoInteira(event: KeyboardEvent) {
     return
   }
 
-  if (!/^\\d$/.test(event.key)) {
+  if (!/^\d$/.test(event.key)) {
     event.preventDefault()
   }
 }
@@ -199,7 +199,7 @@ function bloquearEntradaNaoInteira(event: KeyboardEvent) {
 function bloquearColagemNaoInteira(event: ClipboardEvent) {
   const valorColado = event.clipboardData?.getData('text') ?? ''
 
-  if (!/^\\d+$/.test(valorColado.trim())) {
+  if (!/^\d+$/.test(valorColado.trim())) {
     event.preventDefault()
     mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
   }
