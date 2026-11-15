@@ -202,12 +202,12 @@ describe('useScheduleStore', () => {
     const store = useScheduleStore()
 
     store.adicionarEscalaPersonalizada(3, 1)
-    store.adicionarEscalaPersonalizada(30, 30)
+    store.adicionarEscalaPersonalizada(60, 60)
     store.adicionarEscalaPersonalizada(3, 1)
     store.adicionarEscalaPersonalizada(0, 2)
     store.adicionarEscalaPersonalizada(2, 0)
-    store.adicionarEscalaPersonalizada(31, 1)
-    store.adicionarEscalaPersonalizada(1, 31)
+    store.adicionarEscalaPersonalizada(-1, 2)
+    store.adicionarEscalaPersonalizada(2, -1)
     store.adicionarEscalaPersonalizada(1.5, 2)
     store.adicionarEscalaPersonalizada(2, 1.5)
     store.adicionarEscalaPersonalizada(Number.NaN, 2)
@@ -216,7 +216,7 @@ describe('useScheduleStore', () => {
 
     expect(store.escalasPersonalizadas).toEqual([
       { valor: '3x1', nome: '3x1 (3 dias de trabalho, 1 de folga)' },
-      { valor: '30x30', nome: '30x30 (30 dias de trabalho, 30 de folga)' }
+      { valor: '60x60', nome: '60x60 (60 dias de trabalho, 60 de folga)' }
     ])
     expect(localStorage.setItem).toHaveBeenCalledTimes(2)
     expect(localStorage.setItem).toHaveBeenLastCalledWith(
