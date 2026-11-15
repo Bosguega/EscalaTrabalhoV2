@@ -17,6 +17,7 @@
     </div>
 
     <MenuLateral :aberto="menuLateralAberto" @fechar="fecharMenuLateral" />
+    <Anotacoes />
 
     <!-- Overlay de Loading durante captura -->
     <div v-if="isCapturing" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex flex-col items-center justify-center text-white">
@@ -34,6 +35,7 @@ import NavegacaoMes from './components/NavegacaoMes.vue'
 import AreaCalendario from './components/AreaCalendario.vue'
 import LegendaComSeletor from './components/LegendaComSeletor.vue'
 import MenuLateral from './components/MenuLateral.vue'
+import Anotacoes from './components/Anotacoes.vue'
 import { useThemeStore } from './stores/theme'
 import { useAnimationStore } from './stores/animation'
 import { useScheduleStore } from './stores/schedule'
