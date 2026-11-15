@@ -27,6 +27,17 @@ const escalasFixas: EscalaPersonalizada[] = [
   { valor: '2x2', nome: '2x2 (2 dias de trabalho, 2 de folga)' }
 ]
 
+function converterDataInicial(valor: string): Date {
+  const dataSemHorario = /^(\d{4})-(\d{2})-(\d{2})$/.exec(valor)
+
+  if (dataSemHorario) {
+    const [, ano, mes, dia] = dataSemHorario
+    return new Date(Number(ano), Number(mes) - 1, Number(dia))
+  }
+
+  return new Date(valor)
+}
+
 export const useScheduleStore = defineStore('schedule', () => {
   // Estado
   const escalaAtual = ref('2x2')
@@ -47,7 +58,9 @@ export const useScheduleStore = defineStore('schedule', () => {
       if (dados.escala) {
         const config = JSON.parse(dados.escala)
         escalaAtual.value = config.escala || '2x2'
-        dataInicial.value = config.dataInicial ? new Date(config.dataInicial) : new Date()
+        dataInicial.value = config.dataInicial
+          ? converterDataInicial(config.dataInicial)
+          : new Date()
         if (config.cores) {
           cores.value = {
             trabalho: config.cores.trabalho || '#ef4444',
