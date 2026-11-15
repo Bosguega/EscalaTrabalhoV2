@@ -1,0 +1,180 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { useScheduleStore } from '../../src/stores/schedule'
+import { atualizarDados, carregarDados } from '../../src/utils/useDadosApp'
+
+vi.mock('../../src/utils/useDadosApp', () => ({
+  carregarDados: vi.fn(),
+  atualizarDados: vi.fn()
+}))
+
+const dadosBase = {
+  versao: 2,
+  escala: null,
+  anotacoes: null,
+  animacao: null,
+  tema: null
+}
+
+const dataInicialSalva = '2026-03-10T12:30:00.000Z'
+const coresSalvas = { trabalho: '#123456', folga: '#abcdef' }
+
+function configurarLocalStorage(valor: string | null = null) {
+  const armazenamento = new Map<string, string>()
+  if (valor !== null) armazenamento.set('escalas_personalizadas', valor)
+
+  vi.stubGlobal('localStorage', {
+    getItem: vi.fn((chave: string) => armazenamento.get(chave) ?? null),
+    setItem: vi.fn((chave: string, conteudo: string) => armazenamento.set(chave, conteudo)),
+    removeItem: vi.fn((chave: string) => armazenamento.delete(chave))
+  })
+}
+
+describe('useScheduleStore', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    configurarLocalStorage()
+    vi.mocked(carregarDados).mockResolvedValue({ ...dadosBase })
+    vi.mocked(atualizarDados).mockResolvedValue({ ...dadosBase })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('inicia com a escala padrão, cores padrão e opções fixas', () => {
+    const store = useScheduleStore()
+
+    expect(store.escalaAtual).toBe('2x2')
+    expect(store.cores).toEqual({ trabalho: '#ef4444', folga: '#22c55e' })
+    expect(store.escalasPersonalizadas).toEqual([])
+    expect(store.escalasDisponiveis).toEqual([
+      { valor: '2x2', nome: '2x2 (2 dias de trabalho, 2 de folga)' }
+    ])
+    expect(store.dataInicial).toBeInstanceOf(Date)
+  })
+
+  it('carrega configuração persistida e escalas personalizadas', async () => {
+    vi.mocked(carregarDados).mockResolvedValue({
+      ...dadosBase,
+      escala: JSON.stringify({
+        escala: '3x1',
+        dataInicial: dataInicialSalva,
+        cores: coresSalvas
+      })
+    })
+    configurarLocalStorage(JSON.stringify([
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ]))
+
+    const store = useScheduleStore()
+    await store.carregarConfiguracao()
+
+    expect(store.escalaAtual).toBe('3x1')
+    expect(store.dataInicial.toISOString()).toBe(dataInicialSalva)
+    expect(store.cores).toEqual(coresSalvas)
+    expect(store.escalasPersonalizadas).toEqual([
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ])
+    expect(store.escalasDisponiveis).toHaveLength(2)
+  })
+
+  it('mantém os padrões e não propaga erro quando a configuração está malformada', async () => {
+    vi.mocked(carregarDados).mockResolvedValue({
+      ...dadosBase,
+      escala: '{json inválido'
+    })
+    const erroConsole = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const store = useScheduleStore()
+
+    await expect(store.carregarConfiguracao()).resolves.toBeUndefined()
+
+    expect(store.escalaAtual).toBe('2x2')
+    expect(store.cores).toEqual({ trabalho: '#ef4444', folga: '#22c55e' })
+    expect(erroConsole).toHaveBeenCalled()
+  })
+
+  it('persiste a troca de escala com a data inicial e as cores atuais', async () => {
+    const store = useScheduleStore()
+    store.dataInicial = new Date(dataInicialSalva)
+    store.cores = { ...coresSalvas }
+
+    await store.atualizarEscala('5x2')
+
+    expect(store.escalaAtual).toBe('5x2')
+    expect(atualizarDados).toHaveBeenCalledWith({
+      escala: JSON.stringify({
+        escala: '5x2',
+        dataInicial: dataInicialSalva,
+        cores: coresSalvas
+      })
+    })
+  })
+
+  it('persiste alterações da data inicial e das cores', async () => {
+    const store = useScheduleStore()
+    const novaData = new Date('2026-04-15T08:00:00.000Z')
+    const novasCores = { trabalho: '#111111', folga: '#eeeeee' }
+
+    await store.atualizarDataInicial(novaData)
+    expect(store.dataInicial).toBe(novaData)
+    expect(atualizarDados).toHaveBeenLastCalledWith({
+      escala: JSON.stringify({
+        escala: '2x2',
+        dataInicial: novaData.toISOString(),
+        cores: { trabalho: '#ef4444', folga: '#22c55e' }
+      })
+    })
+
+    await store.atualizarCores(novasCores)
+    expect(store.cores).toEqual(novasCores)
+    expect(atualizarDados).toHaveBeenLastCalledWith({
+      escala: JSON.stringify({
+        escala: '2x2',
+        dataInicial: novaData.toISOString(),
+        cores: novasCores
+      })
+    })
+  })
+
+  it('adiciona escala personalizada válida e ignora valores inválidos ou duplicados', () => {
+    const store = useScheduleStore()
+
+    store.adicionarEscalaPersonalizada(3, 1)
+    store.adicionarEscalaPersonalizada(3, 1)
+    store.adicionarEscalaPersonalizada(0, 2)
+    store.adicionarEscalaPersonalizada(2, 0)
+    store.adicionarEscalaPersonalizada(2, 2)
+
+    expect(store.escalasPersonalizadas).toEqual([
+      { valor: '3x1', nome: '3x1 (3 dias de trabalho, 1 de folga)' }
+    ])
+    expect(localStorage.setItem).toHaveBeenCalledTimes(1)
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'escalas_personalizadas',
+      JSON.stringify(store.escalasPersonalizadas)
+    )
+  })
+
+  it('remove escala personalizada e persiste a lista atualizada', () => {
+    configurarLocalStorage(JSON.stringify([
+      { valor: '3x1', nome: '3x1 personalizada' },
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ]))
+    const store = useScheduleStore()
+    store.escalasPersonalizadas = [
+      { valor: '3x1', nome: '3x1 personalizada' },
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ]
+
+    store.removerEscalaPersonalizada('3x1')
+
+    expect(store.escalasPersonalizadas).toEqual([
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ])
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'escalas_personalizadas',
+      JSON.stringify([{ valor: '4x2', nome: '4x2 personalizada' }])
+    )
+  })
+})
