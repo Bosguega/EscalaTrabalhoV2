@@ -33,9 +33,7 @@ function ehConfiguracaoEscalaValida(valor) {
 
   if (
     !Number.isSafeInteger(diasTrabalho) ||
-    !Number.isSafeInteger(diasFolga) ||
-    diasTrabalho > 30 ||
-    diasFolga > 30
+    !Number.isSafeInteger(diasFolga)
   ) {
     return false
   }
@@ -110,8 +108,8 @@ export function ehConfiguracoesBackupValida(configuracoes) {
           ehObjeto(escala) &&
           typeof escala.valor === 'string' &&
           /^[1-9]\d*x[1-9]\d*$/.test(escala.valor) &&
-          Number(escala.valor.split('x')[0]) <= 30 &&
-          Number(escala.valor.split('x')[1]) <= 30 &&
+          Number.isSafeInteger(Number(escala.valor.split('x')[0])) &&
+          Number.isSafeInteger(Number(escala.valor.split('x')[1])) &&
           typeof escala.nome === 'string' &&
           escala.nome.trim().length > 0
         )

@@ -48,7 +48,6 @@ test('rejeita configuração de escala malformada ou incompatível', () => {
     '{"escala":"invalida","dataInicial":"2026-01-01T00:00:00.000Z"}',
     '{"escala":"0x2","dataInicial":"2026-01-01T00:00:00.000Z"}',
     '{"escala":"2x2","dataInicial":"data-invalida"}',
-    '{"escala":"31x2","dataInicial":"2026-01-01T00:00:00.000Z"}',
     '{"escala":"2x2","dataInicial":"2026-01-01T00:00:00.000Z","cores":[]}'
   ]
 
@@ -60,8 +59,9 @@ test('rejeita configuração de escala malformada ou incompatível', () => {
 test('aceita escala personalizada válida e configuração sem escala', () => {
   assert.equal(ehDadosAppValido({
     ...dados,
-    escala: '{"escala":"30x30","dataInicial":"2026-01-01T00:00:00.000Z","cores":{"trabalho":"#f00","folga":"#0f0"}}'
+    escala: '{"escala":"60x60","dataInicial":"2026-01-01T00:00:00.000Z","cores":{"trabalho":"#f00","folga":"#0f0"}}'
   }), true)
+  assert.equal(ehDadosAppValido({ ...dados, escala: '{"escala":"1.5x2","dataInicial":"2026-01-01T00:00:00.000Z"}' }), false)
   assert.equal(ehDadosAppValido({ ...dados, escala: null }), true)
 })
 
@@ -74,7 +74,8 @@ test('rejeita escalas personalizadas e intervalos inválidos', () => {
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '{' }), false)
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{}]' }), false)
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"0x2","nome":"Inválida"}]' }), false)
-  assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"31x2","nome":"Inválida"}]' }), false)
+  assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"60x60","nome":"60x60"}]' }), true)
+  assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"1.5x2","nome":"Inválida"}]' }), false)
   assert.equal(ehConfiguracoesBackupValida({ backupAutomatico: 'sim' }), false)
   assert.equal(ehConfiguracoesBackupValida({ intervaloBackup: Infinity }), false)
   assert.equal(ehConfiguracoesBackupValida({ intervaloBackup: 0 }), false)

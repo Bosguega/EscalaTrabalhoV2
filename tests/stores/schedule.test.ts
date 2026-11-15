@@ -198,20 +198,28 @@ describe('useScheduleStore', () => {
     })
   })
 
-  it('adiciona escala personalizada válida e ignora valores inválidos ou duplicados', () => {
+  it('adiciona escalas personalizadas válidas e ignora valores inválidos ou duplicados', () => {
     const store = useScheduleStore()
 
     store.adicionarEscalaPersonalizada(3, 1)
+    store.adicionarEscalaPersonalizada(60, 60)
     store.adicionarEscalaPersonalizada(3, 1)
     store.adicionarEscalaPersonalizada(0, 2)
     store.adicionarEscalaPersonalizada(2, 0)
+    store.adicionarEscalaPersonalizada(-1, 2)
+    store.adicionarEscalaPersonalizada(2, -1)
+    store.adicionarEscalaPersonalizada(1.5, 2)
+    store.adicionarEscalaPersonalizada(2, 1.5)
+    store.adicionarEscalaPersonalizada(Number.NaN, 2)
+    store.adicionarEscalaPersonalizada(2, Number.POSITIVE_INFINITY)
     store.adicionarEscalaPersonalizada(2, 2)
 
     expect(store.escalasPersonalizadas).toEqual([
-      { valor: '3x1', nome: '3x1 (3 dias de trabalho, 1 de folga)' }
+      { valor: '3x1', nome: '3x1 (3 dias de trabalho, 1 de folga)' },
+      { valor: '60x60', nome: '60x60 (60 dias de trabalho, 60 de folga)' }
     ])
-    expect(localStorage.setItem).toHaveBeenCalledTimes(1)
-    expect(localStorage.setItem).toHaveBeenCalledWith(
+    expect(localStorage.setItem).toHaveBeenCalledTimes(2)
+    expect(localStorage.setItem).toHaveBeenLastCalledWith(
       'escalas_personalizadas',
       JSON.stringify(store.escalasPersonalizadas)
     )
