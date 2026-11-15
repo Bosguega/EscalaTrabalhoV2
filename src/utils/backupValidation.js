@@ -23,7 +23,7 @@ function ehConfiguracaoEscalaValida(valor) {
   if (!ehObjeto(configuracao)) return false
 
   const correspondencia = typeof configuracao.escala === 'string'
-    ? configuracao.escala.match(/^([1-9]\\d*)x([1-9]\\d*)$/)
+    ? configuracao.escala.match(/^([1-9]\d*)x([1-9]\d*)$/)
     : null
 
   if (!correspondencia) return false
@@ -109,7 +109,7 @@ export function ehConfiguracoesBackupValida(configuracoes) {
         !escalas.every(escala =>
           ehObjeto(escala) &&
           typeof escala.valor === 'string' &&
-          /^[1-9]\\d*x[1-9]\\d*$/.test(escala.valor) &&
+          /^[1-9]\d*x[1-9]\d*$/.test(escala.valor) &&
           Number(escala.valor.split('x')[0]) <= 30 &&
           Number(escala.valor.split('x')[1]) <= 30 &&
           typeof escala.nome === 'string' &&
