@@ -51,7 +51,6 @@
                 v-model="novaEscalaDiasTrabalho"
                 min="1"
                 step="1"
-                step="1"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
@@ -61,6 +60,7 @@
                 type="number"
                 v-model="novaEscalaDiasFolga"
                 min="1"
+                step="1"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
