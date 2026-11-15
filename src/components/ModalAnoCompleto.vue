@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useScheduleStore } from '../stores/schedule'
 import { useNoteStore } from '../stores/note'
 import { gerarMesesDoAno } from '../utils/calendarioUtils'
@@ -129,11 +129,6 @@ function temAnotacao(ano: number, mes: number, dia: number): boolean {
   return noteStore.verificarAnotacao(new Date(ano, mes, dia))
 }
 
-// Carregar anotações do ano selecionado
-async function carregarAnotacoesAno() {
-  await noteStore.carregarAnotacoes()
-}
-
 // Abrir modal de anotações ao clicar em um dia
 function abrirModalAnotacoes(mes: number, dia: number) {
   const data = new Date(anoSelecionado.value, mes, dia)
@@ -146,13 +141,6 @@ function navegarParaMes(mes: number) {
   emit('navegar-para-mes', data)
   emit('update:modelValue', false)
 }
-
-// Observar mudanças no ano selecionado
-watch(() => props.modelValue, async (novoValor) => {
-  if (novoValor) {
-    await carregarAnotacoesAno()
-  }
-})
 
 // Gerar lista de anos disponíveis (5 anos para trás e 5 anos para frente)
 const anosDisponiveis = computed(() => {

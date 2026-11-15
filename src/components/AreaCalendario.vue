@@ -131,7 +131,6 @@ function atualizarDiasDoMes() {
 
 watch(() => props.data, async () => {
   atualizarDiasDoMes()
-  await noteStore.carregarAnotacoes()
 }, { immediate: true })
 
 // Variáveis para swipe
