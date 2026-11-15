@@ -19,7 +19,8 @@
           <label class="block text-xs font-bold text-text opacity-40 uppercase tracking-widest mb-2">Sua Anotação</label>
           <textarea
             v-model="anotacaoLocal"
-            class="w-full bg-secondary/10 text-text border border-border rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-primary min-h-[140px] transition-all resize-none shadow-inner custom-scrollbar"
+            :disabled="!noteStore.anotacoesCarregadas"
+            class="w-full bg-secondary/10 text-text border border-border rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-primary min-h-[140px] transition-all resize-none shadow-inner custom-scrollbar disabled:opacity-50"
             placeholder="Digite algo para este dia..."
           ></textarea>
         </div>
@@ -33,7 +34,8 @@
           </button>
           <button
             @click="salvarAnotacao"
-            class="w-full py-4 text-white font-bold bg-primary rounded-2xl transition-all hover:opacity-90 shadow-lg active:scale-95"
+            :disabled="!noteStore.anotacoesCarregadas"
+            class="w-full py-4 text-white font-bold bg-primary rounded-2xl transition-all hover:opacity-90 shadow-lg active:scale-95 disabled:opacity-50"
           >
             Salvar
           </button>
@@ -50,10 +52,16 @@ import { useNoteStore } from '../stores/note'
 const noteStore = useNoteStore()
 const anotacaoLocal = ref('')
 
-// Carregar anotação existente quando o modal abrir
+// Aguarda a leitura inicial antes de preencher o campo editável.
 watch(() => noteStore.modalAberto, async (novoValor) => {
   if (novoValor && noteStore.dataSelecionada) {
-    anotacaoLocal.value = noteStore.carregarAnotacao(noteStore.dataSelecionada)
+    const data = noteStore.dataSelecionada
+    await noteStore.carregarAnotacoes()
+
+    // Evita preencher o modal se ele foi fechado ou outra data foi selecionada durante a leitura.
+    if (!noteStore.modalAberto || noteStore.dataSelecionada !== data) return
+
+    anotacaoLocal.value = noteStore.carregarAnotacao(data)
   }
 })
 
@@ -61,9 +69,8 @@ function fecharModal() {
   noteStore.fecharModal()
 }
 
-// Salvar anotação no localStorage
 async function salvarAnotacao() {
-  if (!noteStore.dataSelecionada) return
+  if (!noteStore.dataSelecionada || !noteStore.anotacoesCarregadas) return
   await noteStore.salvarAnotacao(noteStore.dataSelecionada, anotacaoLocal.value)
   noteStore.fecharModal()
 }
