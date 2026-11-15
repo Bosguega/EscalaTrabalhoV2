@@ -110,7 +110,14 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   function adicionarEscalaPersonalizada(diasTrabalho: number, diasFolga: number): void {
-    if (diasTrabalho < 1 || diasFolga < 1) return
+    if (
+      !Number.isInteger(diasTrabalho) ||
+      !Number.isInteger(diasFolga) ||
+      diasTrabalho < 1 ||
+      diasFolga < 1 ||
+      diasTrabalho > 30 ||
+      diasFolga > 30
+    ) return
 
     const novaEscalaValor = `${diasTrabalho}x${diasFolga}`
     const novaEscalaNome = `${diasTrabalho}x${diasFolga} (${diasTrabalho} dias de trabalho, ${diasFolga} de folga)`
