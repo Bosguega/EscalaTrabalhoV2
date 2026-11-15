@@ -48,6 +48,23 @@ describe('useNoteStore', () => {
     expect(store.verificarAnotacao(new Date(2026, 1, 4))).toBe(false)
   })
 
+  it('marca a leitura inicial como concluída quando o carregamento falha', async () => {
+    const erro = new Error('falha simulada na leitura inicial')
+    vi.mocked(carregarDados).mockRejectedValueOnce(erro)
+    const erroConsole = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const store = useNoteStore()
+
+    await expect(store.carregarAnotacoes()).resolves.toBeUndefined()
+
+    expect(store.anotacoes).toEqual({})
+    expect(store.anotacoesCarregadas).toBe(true)
+    expect(erroConsole).toHaveBeenCalledWith(
+      'Erro ao carregar anotações:',
+      erro
+    )
+    expect(carregarDados).toHaveBeenCalledTimes(1)
+  })
+
   it('salva uma anotação aguardando a leitura inicial e atualiza o estado', async () => {
     const store = useNoteStore()
 
