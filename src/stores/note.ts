@@ -5,11 +5,10 @@ import { formatarDataChave as formatarDataChaveUtil, verificarAnotacao as verifi
 
 export const useNoteStore = defineStore('note', () => {
   const anotacoes = ref<Record<string, string>>({})
+  const anotacoesCarregadas = ref(false)
   const modalAberto = ref(false)
   const dataSelecionada = ref<Date | null>(null)
-
-  // Inicialização
-  carregarAnotacoes()
+  let carregamentoInicial: Promise<void> | null = null
 
   const formatarDataChave = (data: Date): string => formatarDataChaveUtil(data)
 
@@ -22,19 +21,33 @@ export const useNoteStore = defineStore('note', () => {
     })
   }
 
-  async function carregarAnotacoes(): Promise<void> {
-    try {
-      const dados = await carregarDados()
-      if (dados.anotacoes) {
-        anotacoes.value = JSON.parse(dados.anotacoes)
-      }
-    } catch (error) {
-      console.error('Erro ao carregar anotações:', error)
+  function carregarAnotacoes(): Promise<void> {
+    if (!carregamentoInicial) {
+      carregamentoInicial = (async () => {
+        try {
+          const dados = await carregarDados()
+          if (dados.anotacoes) {
+            anotacoes.value = JSON.parse(dados.anotacoes)
+          }
+        } catch (error) {
+          console.error('Erro ao carregar anotações:', error)
+        } finally {
+          anotacoesCarregadas.value = true
+        }
+      })()
     }
+
+    return carregamentoInicial
   }
+
+  // Inicia a leitura uma única vez; consumidores podem aguardar a mesma Promise.
+  carregarAnotacoes()
 
   async function salvarAnotacao(data: Date, texto: string): Promise<void> {
     try {
+      // Nunca grave usando o estado local antes de terminar a leitura inicial.
+      await carregarAnotacoes()
+
       const dataFormatada = formatarDataChave(data)
       const dadosAtualizados = await atualizarDados(dadosAtuais => {
         let anotacoesAtuais: Record<string, string> = {}
@@ -83,6 +96,7 @@ export const useNoteStore = defineStore('note', () => {
 
   return {
     anotacoes,
+    anotacoesCarregadas,
     modalAberto,
     dataSelecionada,
     formatarData,
