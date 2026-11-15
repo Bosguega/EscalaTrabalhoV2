@@ -89,9 +89,7 @@
         </div>
       </div>
     </div>
-    
-    <!-- Modal de Anotações -->
-    <Anotacoes />
+
   </div>
 </template>
 
@@ -99,7 +97,6 @@
 import { computed, ref, watch } from 'vue'
 import { useScheduleStore } from '../stores/schedule'
 import { useNoteStore } from '../stores/note'
-import Anotacoes from './Anotacoes.vue'
 import { gerarMesesDoAno } from '../utils/calendarioUtils'
 
 const props = defineProps<{
