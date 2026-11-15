@@ -217,4 +217,54 @@ describe('useBackupStore', () => {
     expect(erroConsole).toHaveBeenCalled()
   })
 
+
+
+  it('executa o backup automático quando o intervalo configurado já venceu', async () => {
+    vi.setSystemTime(new Date('2026-11-15T12:00:00.000Z'))
+    vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
+      if (chave === 'backups') return [backupValido]
+      if (chave === 'backupConfig') {
+        return { backupAutomatico: true, intervaloBackup: 1000 }
+      }
+      return null
+    })
+
+    const store = useBackupStore()
+    await store.restaurarBackup(999)
+
+    expect(store.backupAutomatico).toBe(true)
+    expect(store.intervaloBackup).toBe(1000)
+
+    await vi.advanceTimersByTimeAsync(1000)
+
+    expect(store.backups[0].metadata.descricao).toBe('Backup automático')
+    expect(localforage.setItem).toHaveBeenCalledWith(
+      'backups',
+      expect.arrayContaining([
+        expect.objectContaining({
+          metadata: expect.objectContaining({ descricao: 'Backup automático' })
+        })
+      ])
+    )
+  })
+
+  it('não executa backup automático quando a preferência está desativada', async () => {
+    vi.setSystemTime(new Date('2026-11-15T12:00:00.000Z'))
+    vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
+      if (chave === 'backups') return [backupValido]
+      if (chave === 'backupConfig') {
+        return { backupAutomatico: false, intervaloBackup: 1000 }
+      }
+      return null
+    })
+
+    const store = useBackupStore()
+    await store.restaurarBackup(999)
+    await vi.advanceTimersByTimeAsync(5000)
+
+    expect(store.backupAutomatico).toBe(false)
+    expect(store.backups).toHaveLength(1)
+    expect(store.backups[0].metadata.descricao).toBe('Backup de teste')
+    expect(carregarDados).not.toHaveBeenCalled()
+  })
 })
