@@ -148,4 +148,73 @@ describe('useBackupStore', () => {
     expect(resultado).toBe(false)
     expect(salvarDados).not.toHaveBeenCalled()
   })
+
+  it('exporta os dados atuais, backups e configurações em um arquivo JSON válido', async () => {
+    const store = useBackupStore()
+
+    await store.criarBackup('Histórico')
+    const arquivo = JSON.parse(await store.exportarDados())
+
+    expect(arquivo.dados).toEqual(dadosAtuais)
+    expect(arquivo.backups).toHaveLength(1)
+    expect(arquivo.backups[0].metadata.descricao).toBe('Histórico')
+    expect(arquivo.configuracoes).toMatchObject({
+      escalasPersonalizadas: null,
+      backupAutomatico: true,
+      intervaloBackup: 86400000
+    })
+    expect(arquivo.timestamp).toEqual(expect.any(Number))
+  })
+
+  it('importa dados válidos e preserva o backup de segurança no histórico', async () => {
+    const store = useBackupStore()
+    const dadosImportados = {
+      ...dadosAtuais,
+      anotacoes: JSON.stringify({ '2026-05-10': 'Dados importados' })
+    }
+    const arquivo = {
+      dados: dadosImportados,
+      backups: [backupValido],
+      configuracoes: {
+        escalasPersonalizadas: null,
+        backupAutomatico: false,
+        intervaloBackup: 43200000
+      },
+      timestamp: 456
+    }
+
+    const resultado = await store.importarDados(JSON.stringify(arquivo))
+
+    expect(resultado).toBe(true)
+    expect(salvarDados).toHaveBeenCalledWith(dadosImportados)
+    expect(store.backupAutomatico).toBe(false)
+    expect(store.intervaloBackup).toBe(43200000)
+    expect(store.backups).toHaveLength(2)
+    expect(store.backups.map(backup => backup.metadata.descricao)).toContain(
+      'Backup automático antes da importação'
+    )
+    expect(localforage.setItem).toHaveBeenCalledWith('backups', expect.any(Array))
+  })
+
+  it('reverte os dados anteriores quando a gravação da importação falha', async () => {
+    const store = useBackupStore()
+    const erro = new Error('falha ao gravar dados importados')
+    vi.mocked(carregarDados).mockResolvedValue({ ...dadosAnteriores })
+    vi.mocked(salvarDados)
+      .mockRejectedValueOnce(erro)
+      .mockResolvedValueOnce(undefined)
+    const erroConsole = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const resultado = await store.importarDados(JSON.stringify({
+      dados: dadosAtuais,
+      backups: [],
+      timestamp: 456
+    }))
+
+    expect(resultado).toBe(false)
+    expect(salvarDados).toHaveBeenNthCalledWith(1, dadosAtuais)
+    expect(salvarDados).toHaveBeenNthCalledWith(2, dadosAnteriores)
+    expect(erroConsole).toHaveBeenCalled()
+  })
+
 })
