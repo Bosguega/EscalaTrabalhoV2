@@ -20,10 +20,15 @@
           <textarea
             v-model="anotacaoLocal"
             :disabled="!noteStore.anotacoesCarregadas"
+            @input="erroSalvamento = ''"
             class="w-full bg-secondary/10 text-text border border-border rounded-2xl py-4 px-4 focus:outline-none focus:ring-2 focus:ring-primary min-h-[140px] transition-all resize-none shadow-inner custom-scrollbar disabled:opacity-50"
             placeholder="Digite algo para este dia..."
           ></textarea>
         </div>
+
+        <p v-if="erroSalvamento" role="alert" class="text-sm text-red-500 font-medium">
+          {{ erroSalvamento }}
+        </p>
 
         <div class="flex flex-col sm:flex-row justify-between gap-4 mt-8">
           <button
@@ -34,10 +39,10 @@
           </button>
           <button
             @click="salvarAnotacao"
-            :disabled="!noteStore.anotacoesCarregadas"
+            :disabled="!noteStore.anotacoesCarregadas || salvando"
             class="w-full py-4 text-white font-bold bg-primary rounded-2xl transition-all hover:opacity-90 shadow-lg active:scale-95 disabled:opacity-50"
           >
-            Salvar
+            {{ salvando ? 'Salvando...' : 'Salvar' }}
           </button>
         </div>
       </div>
@@ -51,6 +56,8 @@ import { useNoteStore } from '../stores/note'
 
 const noteStore = useNoteStore()
 const anotacaoLocal = ref('')
+const erroSalvamento = ref('')
+const salvando = ref(false)
 
 // Aguarda a leitura inicial antes de preencher o campo editável.
 watch(() => noteStore.modalAberto, async (novoValor) => {
@@ -62,6 +69,7 @@ watch(() => noteStore.modalAberto, async (novoValor) => {
     if (!noteStore.modalAberto || noteStore.dataSelecionada !== data) return
 
     anotacaoLocal.value = noteStore.carregarAnotacao(data)
+    erroSalvamento.value = ''
   }
 })
 
@@ -70,8 +78,18 @@ function fecharModal() {
 }
 
 async function salvarAnotacao() {
-  if (!noteStore.dataSelecionada || !noteStore.anotacoesCarregadas) return
-  await noteStore.salvarAnotacao(noteStore.dataSelecionada, anotacaoLocal.value)
-  noteStore.fecharModal()
+  if (!noteStore.dataSelecionada || !noteStore.anotacoesCarregadas || salvando.value) return
+
+  salvando.value = true
+  erroSalvamento.value = ''
+
+  try {
+    await noteStore.salvarAnotacao(noteStore.dataSelecionada, anotacaoLocal.value)
+    noteStore.fecharModal()
+  } catch {
+    erroSalvamento.value = 'Não foi possível salvar a anotação. Verifique o armazenamento e tente novamente.'
+  } finally {
+    salvando.value = false
+  }
 }
 </script>
