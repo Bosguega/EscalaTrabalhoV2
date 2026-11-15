@@ -51,6 +51,10 @@
                 v-model="novaEscalaDiasTrabalho"
                 min="1"
                 step="1"
+                inputmode="numeric"
+                @keydown="bloquearEntradaNaoInteira"
+                @paste="bloquearColagemNaoInteira"
+                @input="mensagemErroEscala = ''"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
@@ -61,10 +65,17 @@
                 v-model="novaEscalaDiasFolga"
                 min="1"
                 step="1"
+                inputmode="numeric"
+                @keydown="bloquearEntradaNaoInteira"
+                @paste="bloquearColagemNaoInteira"
+                @input="mensagemErroEscala = ''"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
           </div>
+          <p v-if="mensagemErroEscala" class="text-sm text-red-500" role="alert">
+            {{ mensagemErroEscala }}
+          </p>
           <div class="flex justify-end">
             <button
               @click="adicionarNovaEscala"
@@ -156,6 +167,7 @@ const dataInicialLocal = ref(
 )
 const novaEscalaDiasTrabalho = ref(1)
 const novaEscalaDiasFolga = ref(1)
+const mensagemErroEscala = ref('')
 const escalaParaRemover = ref('')
 
 // Atualizar escala e data inicial sempre que props mudar
@@ -166,6 +178,33 @@ watchEffect(() => {
     : new Date().toISOString().slice(0, 10)
 })
 
+// Impedir a digitação de caracteres que permitam valores não inteiros.
+function bloquearEntradaNaoInteira(event: KeyboardEvent) {
+  const teclasDeControle = [
+    'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+    'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+    'Home', 'End'
+  ]
+
+  if (teclasDeControle.includes(event.key) || event.ctrlKey || event.metaKey) {
+    return
+  }
+
+  if (!/^\\d$/.test(event.key)) {
+    event.preventDefault()
+  }
+}
+
+// Impedir colagem de valores que não sejam formados apenas por dígitos.
+function bloquearColagemNaoInteira(event: ClipboardEvent) {
+  const valorColado = event.clipboardData?.getData('text') ?? ''
+
+  if (!/^\\d+$/.test(valorColado.trim())) {
+    event.preventDefault()
+    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
+  }
+}
+
 // Adicionar nova escala personalizada
 function adicionarNovaEscala() {
   if (
@@ -174,6 +213,7 @@ function adicionarNovaEscala() {
     novaEscalaDiasTrabalho.value < 1 ||
     novaEscalaDiasFolga.value < 1
   ) {
+    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
     return
   }
 
