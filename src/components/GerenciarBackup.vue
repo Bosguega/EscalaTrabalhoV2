@@ -195,27 +195,48 @@ async function exportarDados() {
 
 async function handleFileImport(event: Event) {
   const input = event.target as HTMLInputElement
-  if (!input.files?.length) return
+  const file = input.files?.[0]
+  if (!file) return
 
-  const file = input.files[0]
+  // Permite selecionar novamente o mesmo arquivo em uma próxima tentativa.
+  input.value = ''
+
   const reader = new FileReader()
 
   reader.onload = async (e) => {
     try {
-      const conteudo = e.target?.result as string
+      const conteudo = e.target?.result
+      if (typeof conteudo !== 'string') {
+        throw new Error('O arquivo não retornou um conteúdo de texto válido')
+      }
+
       if (await backupStore.importarDados(conteudo)) {
         alert('Dados importados com sucesso!')
         window.location.reload()
       } else {
-        alert('Erro ao importar dados')
+        alert('Erro ao importar dados. Verifique se o arquivo é um backup válido.')
       }
     } catch (error) {
-      alert('Erro ao ler arquivo')
-      console.error(error)
+      alert('Não foi possível processar o arquivo de backup.')
+      console.error('Erro ao processar arquivo de backup:', error)
     }
   }
 
-  reader.readAsText(file)
+  reader.onerror = () => {
+    alert('Não foi possível ler o arquivo de backup.')
+    console.error('Erro na leitura do arquivo:', reader.error)
+  }
+
+  reader.onabort = () => {
+    alert('A leitura do arquivo de backup foi cancelada.')
+  }
+
+  try {
+    reader.readAsText(file)
+  } catch (error) {
+    alert('Não foi possível iniciar a leitura do arquivo de backup.')
+    console.error('Erro ao iniciar leitura do arquivo:', error)
+  }
 }
 
 const triggerFileInput = () => {
