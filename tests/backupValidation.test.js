@@ -42,6 +42,29 @@ test('rejeita versão, campos e tema incompatíveis', () => {
   assert.equal(ehDadosAppValido([]), false)
 })
 
+test('rejeita configuração de escala malformada ou incompatível', () => {
+  const configuracoesInvalidas = [
+    '{',
+    '{"escala":"invalida","dataInicial":"2026-01-01T00:00:00.000Z"}',
+    '{"escala":"0x2","dataInicial":"2026-01-01T00:00:00.000Z"}',
+    '{"escala":"2x2","dataInicial":"data-invalida"}',
+    '{"escala":"31x2","dataInicial":"2026-01-01T00:00:00.000Z"}',
+    '{"escala":"2x2","dataInicial":"2026-01-01T00:00:00.000Z","cores":[]}'
+  ]
+
+  for (const escala of configuracoesInvalidas) {
+    assert.equal(ehDadosAppValido({ ...dados, escala }), false, escala)
+  }
+})
+
+test('aceita escala personalizada válida e configuração sem escala', () => {
+  assert.equal(ehDadosAppValido({
+    ...dados,
+    escala: '{"escala":"30x30","dataInicial":"2026-01-01T00:00:00.000Z","cores":{"trabalho":"#f00","folga":"#0f0"}}'
+  }), true)
+  assert.equal(ehDadosAppValido({ ...dados, escala: null }), true)
+})
+
 test('aceita configurações de backup válidas', () => {
   assert.equal(ehConfiguracoesBackupValida(configuracoes), true)
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: null }), true)
@@ -50,6 +73,8 @@ test('aceita configurações de backup válidas', () => {
 test('rejeita escalas personalizadas e intervalos inválidos', () => {
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '{' }), false)
   assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{}]' }), false)
+  assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"0x2","nome":"Inválida"}]' }), false)
+  assert.equal(ehConfiguracoesBackupValida({ escalasPersonalizadas: '[{"valor":"31x2","nome":"Inválida"}]' }), false)
   assert.equal(ehConfiguracoesBackupValida({ backupAutomatico: 'sim' }), false)
   assert.equal(ehConfiguracoesBackupValida({ intervaloBackup: Infinity }), false)
   assert.equal(ehConfiguracoesBackupValida({ intervaloBackup: 0 }), false)
@@ -62,6 +87,7 @@ test('aceita backup completo e compatível', () => {
 test('rejeita backup com timestamp ou conteúdo inválido', () => {
   assert.equal(ehBackupValido({ ...criarBackup(), metadata: { timestamp: NaN } }), false)
   assert.equal(ehBackupValido({ ...criarBackup(), dados: { versao: 9 } }), false)
+  assert.equal(ehBackupValido({ ...criarBackup(), dados: { ...dados, escala: '{"escala":"invalida"}' } }), false)
   assert.equal(ehBackupValido({ ...criarBackup(), configuracoes: { intervaloBackup: -1 } }), false)
 })
 
