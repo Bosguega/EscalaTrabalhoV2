@@ -79,6 +79,20 @@ describe('useScheduleStore', () => {
     expect(store.escalasDisponiveis).toHaveLength(2)
   })
 
+  it('mantém os padrões e registra erro quando a leitura inicial falha', async () => {
+    const erro = new Error('falha ao carregar configuração')
+    vi.mocked(carregarDados).mockRejectedValueOnce(erro)
+    const erroConsole = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const store = useScheduleStore()
+
+    await expect(store.carregarConfiguracao()).resolves.toBeUndefined()
+
+    expect(store.escalaAtual).toBe('2x2')
+    expect(store.cores).toEqual({ trabalho: '#ef4444', folga: '#22c55e' })
+    expect(store.escalasPersonalizadas).toEqual([])
+    expect(erroConsole).toHaveBeenCalledWith('Erro ao carregar configuração:', erro)
+  })
+
   it('mantém os padrões e não propaga erro quando a configuração está malformada', async () => {
     vi.mocked(carregarDados).mockResolvedValue({
       ...dadosBase,
