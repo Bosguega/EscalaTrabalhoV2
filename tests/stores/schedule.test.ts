@@ -111,6 +111,23 @@ describe('useScheduleStore', () => {
     })
   })
 
+  it('propaga falha ao persistir a troca de escala e mantém o estado atualizado', async () => {
+    const store = useScheduleStore()
+    const erro = new Error('falha simulada ao salvar a escala')
+    vi.mocked(atualizarDados).mockRejectedValueOnce(erro)
+
+    await expect(store.atualizarEscala('5x2')).rejects.toBe(erro)
+
+    expect(store.escalaAtual).toBe('5x2')
+    expect(atualizarDados).toHaveBeenCalledWith({
+      escala: JSON.stringify({
+        escala: '5x2',
+        dataInicial: store.dataInicial.toISOString(),
+        cores: store.cores
+      })
+    })
+  })
+
   it('persiste alterações da data inicial e das cores', async () => {
     const store = useScheduleStore()
     const novaData = new Date('2026-04-15T08:00:00.000Z')
