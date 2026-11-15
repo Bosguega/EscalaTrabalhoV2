@@ -10,6 +10,8 @@ import {
 test('interpreta escalas no formato trabalho x folga', () => {
   assert.deepEqual(calcularPadraoEscala('2x2'), { diasTrabalho: 2, diasFolga: 2 })
   assert.deepEqual(calcularPadraoEscala('12x3'), { diasTrabalho: 12, diasFolga: 3 })
+  assert.deepEqual(calcularPadraoEscala('1.5x1.5'), { diasTrabalho: 2, diasFolga: 2 })
+  assert.deepEqual(calcularPadraoEscala('invalida'), { diasTrabalho: 2, diasFolga: 2 })
 })
 
 test('identifica corretamente os dias de trabalho e folga no ciclo', () => {

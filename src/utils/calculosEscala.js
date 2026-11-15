@@ -1,6 +1,15 @@
 export function calcularPadraoEscala(escala) {
-  const [trabalho, folga] = escala.split('x').map(Number)
-  return { diasTrabalho: trabalho, diasFolga: folga }
+  if (typeof escala === 'string') {
+    const match = /^([1-9]\d*)x([1-9]\d*)$/.exec(escala)
+    if (match) {
+      const trabalho = Number(match[1])
+      const folga = Number(match[2])
+      if (Number.isSafeInteger(trabalho) && Number.isSafeInteger(folga)) {
+        return { diasTrabalho: trabalho, diasFolga: folga }
+      }
+    }
+  }
+  return { diasTrabalho: 2, diasFolga: 2 }
 }
 
 export function calcularDiasDoMes(data) {

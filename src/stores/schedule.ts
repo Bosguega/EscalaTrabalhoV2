@@ -57,7 +57,18 @@ export const useScheduleStore = defineStore('schedule', () => {
       const dados = await carregarDados()
       if (dados.escala) {
         const config = JSON.parse(dados.escala)
-        escalaAtual.value = config.escala || '2x2'
+        const match = typeof config.escala === 'string'
+          ? /^([1-9]\d*)x([1-9]\d*)$/.exec(config.escala)
+          : null
+        const trabalho = match ? Number(match[1]) : 0
+        const folga = match ? Number(match[2]) : 0
+
+        if (match && Number.isSafeInteger(trabalho) && Number.isSafeInteger(folga)) {
+          escalaAtual.value = config.escala
+        } else {
+          escalaAtual.value = '2x2'
+        }
+
         dataInicial.value = config.dataInicial
           ? converterDataInicial(config.dataInicial)
           : new Date()
@@ -71,7 +82,25 @@ export const useScheduleStore = defineStore('schedule', () => {
 
       const escalasSalvas = localStorage.getItem('escalas_personalizadas')
       if (escalasSalvas) {
-        escalasPersonalizadas.value = JSON.parse(escalasSalvas)
+        try {
+          const parsed = JSON.parse(escalasSalvas)
+          if (Array.isArray(parsed)) {
+            const validas = parsed.filter(escala => {
+              if (!escala || typeof escala.valor !== 'string') return false
+              const match = /^([1-9]\d*)x([1-9]\d*)$/.exec(escala.valor)
+              if (!match) return false
+              const t = Number(match[1])
+              const f = Number(match[2])
+              return Number.isSafeInteger(t) && Number.isSafeInteger(f)
+            })
+            escalasPersonalizadas.value = validas
+            if (validas.length !== parsed.length) {
+              localStorage.setItem('escalas_personalizadas', JSON.stringify(validas))
+            }
+          }
+        } catch {
+          escalasPersonalizadas.value = []
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar configuração:', error)
@@ -83,6 +112,16 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   async function atualizarEscala(novaEscala: string): Promise<void> {
+    const match = typeof novaEscala === 'string'
+      ? /^([1-9]\d*)x([1-9]\d*)$/.exec(novaEscala)
+      : null
+    const trabalho = match ? Number(match[1]) : 0
+    const folga = match ? Number(match[2]) : 0
+
+    if (!match || !Number.isSafeInteger(trabalho) || !Number.isSafeInteger(folga)) {
+      return
+    }
+
     escalaAtual.value = novaEscala
     await salvarConfiguracao({
       escala: novaEscala,

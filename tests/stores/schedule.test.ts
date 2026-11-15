@@ -108,6 +108,33 @@ describe('useScheduleStore', () => {
     expect(erroConsole).toHaveBeenCalled()
   })
 
+  it('descarta escalas com dias não inteiros e restaura padrão ao carregar configuração', async () => {
+    vi.mocked(carregarDados).mockResolvedValue({
+      ...dadosBase,
+      escala: JSON.stringify({
+        escala: '1.5x1.5',
+        dataInicial: dataInicialSalva,
+        cores: coresSalvas
+      })
+    })
+    configurarLocalStorage(JSON.stringify([
+      { valor: '1.5x1.5', nome: '1.5x1.5' },
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ]))
+
+    const store = useScheduleStore()
+    await store.carregarConfiguracao()
+
+    expect(store.escalaAtual).toBe('2x2')
+    expect(store.escalasPersonalizadas).toEqual([
+      { valor: '4x2', nome: '4x2 personalizada' }
+    ])
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'escalas_personalizadas',
+      JSON.stringify([{ valor: '4x2', nome: '4x2 personalizada' }])
+    )
+  })
+
   it('interpreta data inicial sem horário como data local, sem recuar um dia', async () => {
     const fusoOriginal = process.env.TZ
     process.env.TZ = 'America/Sao_Paulo'
@@ -153,6 +180,17 @@ describe('useScheduleStore', () => {
         cores: coresSalvas
       })
     })
+  })
+
+  it('ignora atualização com escala de formato não inteiro ou inválido', async () => {
+    const store = useScheduleStore()
+
+    await store.atualizarEscala('1.5x1.5')
+    await store.atualizarEscala('0x2')
+    await store.atualizarEscala('invalida')
+
+    expect(store.escalaAtual).toBe('2x2')
+    expect(atualizarDados).not.toHaveBeenCalled()
   })
 
   it('propaga falha ao persistir a troca de escala e mantém o estado atualizado', async () => {

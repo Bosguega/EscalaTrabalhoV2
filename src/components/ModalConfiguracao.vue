@@ -54,7 +54,7 @@
                 inputmode="numeric"
                 @keydown="bloquearEntradaNaoInteira"
                 @paste="bloquearColagemNaoInteira"
-                @input="mensagemErroEscala = ''"
+                @input="sanitizarEntrada('trabalho', $event)"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
@@ -68,7 +68,7 @@
                 inputmode="numeric"
                 @keydown="bloquearEntradaNaoInteira"
                 @paste="bloquearColagemNaoInteira"
-                @input="mensagemErroEscala = ''"
+                @input="sanitizarEntrada('folga', $event)"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
@@ -205,27 +205,47 @@ function bloquearColagemNaoInteira(event: ClipboardEvent) {
   }
 }
 
+// Sanitizar qualquer entrada (IME, mobile, autocomplete) que contenha caracteres não inteiros
+function sanitizarEntrada(campo: 'trabalho' | 'folga', event: Event) {
+  mensagemErroEscala.value = ''
+  const input = event.target as HTMLInputElement
+  if (input.value && !/^\d+$/.test(input.value)) {
+    const valorLimpo = input.value.replace(/\D/g, '')
+    input.value = valorLimpo
+    if (campo === 'trabalho') {
+      novaEscalaDiasTrabalho.value = valorLimpo ? Number(valorLimpo) : 1
+    } else {
+      novaEscalaDiasFolga.value = valorLimpo ? Number(valorLimpo) : 1
+    }
+    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
+  }
+}
+
 // Adicionar nova escala personalizada
 function adicionarNovaEscala() {
+  const trabalho = Number(novaEscalaDiasTrabalho.value)
+  const folga = Number(novaEscalaDiasFolga.value)
+
   if (
-    !Number.isSafeInteger(novaEscalaDiasTrabalho.value) ||
-    !Number.isSafeInteger(novaEscalaDiasFolga.value) ||
-    novaEscalaDiasTrabalho.value < 1 ||
-    novaEscalaDiasFolga.value < 1
+    !Number.isSafeInteger(trabalho) ||
+    !Number.isSafeInteger(folga) ||
+    trabalho < 1 ||
+    folga < 1
   ) {
     mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
     return
   }
 
-  const novaEscalaValor = `${novaEscalaDiasTrabalho.value}x${novaEscalaDiasFolga.value}`
+  const novaEscalaValor = `${trabalho}x${folga}`
   const jaExiste = scheduleStore.escalasDisponiveis.some(e => e.valor === novaEscalaValor)
   if (jaExiste) {
+    escalaLocal.value = novaEscalaValor
     return
   }
 
   scheduleStore.adicionarEscalaPersonalizada(
-    novaEscalaDiasTrabalho.value,
-    novaEscalaDiasFolga.value
+    trabalho,
+    folga
   )
   escalaLocal.value = novaEscalaValor
 }
@@ -243,6 +263,11 @@ function removerEscala() {
 function salvarEscala() {
   if (escalaLocal.value === 'nova-escala' || escalaLocal.value === 'remover-escala') {
     escalaLocal.value = props.escalaAtual
+    return
+  }
+
+  if (!/^[1-9]\d*x[1-9]\d*$/.test(escalaLocal.value)) {
+    escalaLocal.value = props.escalaAtual || '2x2'
     return
   }
 
