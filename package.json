@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
     "type-check": "vue-tsc -b",
-    "test": "node --test"
+    "test": "node --test tests/*.test.js && vitest run"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
@@ -27,6 +27,7 @@
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
     "vite-plugin-pwa": "^1.0.0",
+    "vitest": "^3.2.4",
     "vue-tsc": "^2.2.4"
   }
 }
