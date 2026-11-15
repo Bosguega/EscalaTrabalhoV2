@@ -50,7 +50,7 @@
                 type="number"
                 v-model="novaEscalaDiasTrabalho"
                 min="1"
-                max="30"
+                step="1"
                 class="w-full bg-card border border-border rounded-xl py-3 px-3 focus:outline-none focus:ring-2 focus:ring-primary text-text"
               >
             </div>
@@ -169,12 +169,10 @@ watchEffect(() => {
 // Adicionar nova escala personalizada
 function adicionarNovaEscala() {
   if (
-    !Number.isInteger(novaEscalaDiasTrabalho.value) ||
-    !Number.isInteger(novaEscalaDiasFolga.value) ||
+    !Number.isSafeInteger(novaEscalaDiasTrabalho.value) ||
+    !Number.isSafeInteger(novaEscalaDiasFolga.value) ||
     novaEscalaDiasTrabalho.value < 1 ||
-    novaEscalaDiasFolga.value < 1 ||
-    novaEscalaDiasTrabalho.value > 30 ||
-    novaEscalaDiasFolga.value > 30
+    novaEscalaDiasFolga.value < 1
   ) {
     return
   }
