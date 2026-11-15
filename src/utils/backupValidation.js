@@ -9,6 +9,58 @@ function ehStringOpcional(valor) {
   return valor === undefined || valor === null || typeof valor === 'string'
 }
 
+function ehConfiguracaoEscalaValida(valor) {
+  if (valor === null || valor === undefined) return true
+  if (typeof valor !== 'string') return false
+
+  let configuracao
+  try {
+    configuracao = JSON.parse(valor)
+  } catch {
+    return false
+  }
+
+  if (!ehObjeto(configuracao)) return false
+
+  const correspondencia = typeof configuracao.escala === 'string'
+    ? configuracao.escala.match(/^([1-9]\d*)x([1-9]\d*)$/)
+    : null
+
+  if (!correspondencia) return false
+
+  const diasTrabalho = Number(correspondencia[1])
+  const diasFolga = Number(correspondencia[2])
+
+  if (
+    !Number.isSafeInteger(diasTrabalho) ||
+    !Number.isSafeInteger(diasFolga) ||
+    diasTrabalho > 30 ||
+    diasFolga > 30
+  ) {
+    return false
+  }
+
+  if (
+    typeof configuracao.dataInicial !== 'string' ||
+    configuracao.dataInicial.trim() === '' ||
+    !Number.isFinite(Date.parse(configuracao.dataInicial))
+  ) {
+    return false
+  }
+
+  if (configuracao.cores !== undefined) {
+    if (
+      !ehObjeto(configuracao.cores) ||
+      (configuracao.cores.trabalho !== undefined && typeof configuracao.cores.trabalho !== 'string') ||
+      (configuracao.cores.folga !== undefined && typeof configuracao.cores.folga !== 'string')
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export function ehDadosAppValido(dados) {
   if (!ehObjeto(dados) || !VERSOES_SUPORTADAS.includes(dados.versao)) {
     return false
@@ -23,6 +75,13 @@ export function ehDadosAppValido(dados) {
     !ehStringOpcional(dados.anotacoes) ||
     !ehStringOpcional(dados.animacao) ||
     !ehStringOpcional(dados.tema)
+  ) {
+    return false
+  }
+
+  if (
+    dados.versao === 2 &&
+    !ehConfiguracaoEscalaValida(dados.escala)
   ) {
     return false
   }
@@ -50,9 +109,11 @@ export function ehConfiguracoesBackupValida(configuracoes) {
         !escalas.every(escala =>
           ehObjeto(escala) &&
           typeof escala.valor === 'string' &&
-          escala.valor.length > 0 &&
+          /^[1-9]\d*x[1-9]\d*$/.test(escala.valor) &&
+          Number(escala.valor.split('x')[0]) <= 30 &&
+          Number(escala.valor.split('x')[1]) <= 30 &&
           typeof escala.nome === 'string' &&
-          escala.nome.length > 0
+          escala.nome.trim().length > 0
         )
       ) {
         return false
