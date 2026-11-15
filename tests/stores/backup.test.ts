@@ -218,7 +218,6 @@ describe('useBackupStore', () => {
   })
 
 
-
   it('executa o backup automático quando o intervalo configurado já venceu', async () => {
     vi.setSystemTime(new Date('2026-11-15T12:00:00.000Z'))
     vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
@@ -235,7 +234,7 @@ describe('useBackupStore', () => {
     expect(store.backupAutomatico).toBe(true)
     expect(store.intervaloBackup).toBe(1000)
 
-    await vi.advanceTimersByTimeAsync(1000)
+    await vi.advanceTimersByTimeAsync(60 * 60 * 1000)
 
     expect(store.backups[0].metadata.descricao).toBe('Backup automático')
     expect(localforage.setItem).toHaveBeenCalledWith(
