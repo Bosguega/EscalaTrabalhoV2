@@ -168,7 +168,14 @@ watchEffect(() => {
 
 // Adicionar nova escala personalizada
 function adicionarNovaEscala() {
-  if (novaEscalaDiasTrabalho.value < 1 || novaEscalaDiasFolga.value < 1) {
+  if (
+    !Number.isInteger(novaEscalaDiasTrabalho.value) ||
+    !Number.isInteger(novaEscalaDiasFolga.value) ||
+    novaEscalaDiasTrabalho.value < 1 ||
+    novaEscalaDiasFolga.value < 1 ||
+    novaEscalaDiasTrabalho.value > 30 ||
+    novaEscalaDiasFolga.value > 30
+  ) {
     return
   }
 
