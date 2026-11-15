@@ -108,6 +108,36 @@ describe('useScheduleStore', () => {
     expect(erroConsole).toHaveBeenCalled()
   })
 
+  it('interpreta data inicial sem horário como data local, sem recuar um dia', async () => {
+    const fusoOriginal = process.env.TZ
+    process.env.TZ = 'America/Sao_Paulo'
+
+    try {
+      vi.mocked(carregarDados).mockResolvedValue({
+        ...dadosBase,
+        escala: JSON.stringify({
+          escala: '2x2',
+          dataInicial: '2026-03-10'
+        })
+      })
+
+      const store = useScheduleStore()
+      await store.carregarConfiguracao()
+
+      expect([
+        store.dataInicial.getFullYear(),
+        store.dataInicial.getMonth(),
+        store.dataInicial.getDate()
+      ]).toEqual([2026, 2, 10])
+    } finally {
+      if (fusoOriginal === undefined) {
+        delete process.env.TZ
+      } else {
+        process.env.TZ = fusoOriginal
+      }
+    }
+  })
+
   it('persiste a troca de escala com a data inicial e as cores atuais', async () => {
     const store = useScheduleStore()
     store.dataInicial = new Date(dataInicialSalva)
