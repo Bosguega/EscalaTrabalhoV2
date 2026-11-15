@@ -74,27 +74,33 @@ function fecharMenuLateral() {
 
 // Função para capturar e compartilhar
 async function handleShare() {
-  if (!areaCapture.value) return
+  const element = areaCapture.value
+  if (!element) return
   
   try {
     isCapturing.value = true
     
     // Adiciona classe para ajustes específicos de captura (ex: esconder inputs ou mostrar logo)
-    areaCapture.value.classList.add('capturing')
+    element.classList.add('capturing')
     
-    // Pequeno delay para garantir que o DOM está pronto e a classe aplicada
-    await new Promise(resolve => setTimeout(resolve, 100))
+    let canvas: HTMLCanvasElement
 
-    const canvas = await html2canvas(areaCapture.value, {
-      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim() 
-        ? `rgb(${getComputedStyle(document.documentElement).getPropertyValue('--color-background')})` 
-        : '#0a1220',
-      scale: 2, // Melhor qualidade
-      logging: false,
-      useCORS: true
-    })
+    try {
+      // Pequeno delay para garantir que o DOM está pronto e a classe aplicada
+      await new Promise(resolve => setTimeout(resolve, 100))
 
-    areaCapture.value.classList.remove('capturing')
+      canvas = await html2canvas(element, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim() 
+          ? `rgb(${getComputedStyle(document.documentElement).getPropertyValue('--color-background')})` 
+          : '#0a1220',
+        scale: 2, // Melhor qualidade
+        logging: false,
+        useCORS: true
+      })
+    } finally {
+      // Garante a limpeza mesmo se a captura falhar
+      element.classList.remove('capturing')
+    }
 
     const image = canvas.toDataURL('image/png')
     
@@ -116,6 +122,9 @@ async function handleShare() {
       downloadImage(image)
     }
   } catch (error) {
+    // Cancelar a janela de compartilhamento é uma ação normal do usuário
+    if (error instanceof Error && error.name === 'AbortError') return
+
     console.error('Erro ao compartilhar:', error)
     alert('Não foi possível gerar a imagem.')
   } finally {
