@@ -15,8 +15,10 @@ Aplicativo web para organizar uma escala de trabalho em ciclos de dias trabalhad
 
 ## Requisitos
 
-- Node.js 22 (mesma versão usada na validação contínua).
+- Node.js 22 ou 24.
 - npm.
+
+A validação contínua do projeto executa os testes, a verificação de tipos e o build nas duas versões do Node.js.
 
 ## Executar localmente
 
@@ -55,7 +57,7 @@ O armazenamento do navegador pode ser apagado pelo próprio usuário, pelo naveg
 
 ## Instalação como aplicativo (PWA)
 
-O projeto inclui configuração de Progressive Web App (PWA), com manifesto, ícones e recursos para instalação pelo navegador. A instalação depende do navegador e do dispositivo.
+O projeto utiliza configuração de Progressive Web App (PWA), com manifesto, ícones e geração automática do Service Worker durante o build. A instalação depende do navegador e do dispositivo.
 
 ### Desktop (Chrome ou Edge)
 
@@ -79,11 +81,11 @@ Os nomes e a disponibilidade dessas opções variam conforme a versão do navega
 
 ### Funcionamento offline e limitações
 
-- A instalação do PWA não substitui a exportação de dados nem os backups.
-- O uso offline depende de o Service Worker ter sido instalado e de os recursos necessários terem sido armazenados em cache após o acesso online.
-- Os dados continuam armazenados localmente no navegador; não existe sincronização automática com servidor ou entre dispositivos.
+O Service Worker é gerado pelo Workbox durante o build e utiliza uma lista de recursos da aplicação para pré-cache. O funcionamento offline depende de o Service Worker ter sido instalado e de os recursos necessários terem sido armazenados em cache após o acesso online.
 
-**Limitação conhecida:** a configuração do PWA e o registro do Service Worker estão passando por uma revisão técnica. Até essa revisão ser concluída e testada, não conte com o funcionamento offline como única forma de acesso aos seus dados.
+A configuração técnica do PWA não substitui um teste no navegador e não garante que todos os recursos externos ou todas as situações de uso estejam disponíveis offline. Antes de depender do aplicativo sem conexão, faça um teste prático no dispositivo que será utilizado.
+
+Os dados continuam armazenados localmente no navegador; não existe sincronização automática com servidor ou entre dispositivos. A instalação do PWA também não substitui a exportação de dados nem os backups.
 
 ### Solução de problemas
 
@@ -103,6 +105,13 @@ Se a instalação ou a abertura do aplicativo apresentar problemas:
 - `public/`: manifesto, ícones e recursos públicos do PWA.
 - `.github/workflows/`: validação e publicação automatizadas.
 
-## Publicação
+## Validação contínua e publicação
 
-O workflow de publicação está em `.github/workflows/deploy.yml` e publica a versão de produção no GitHub Pages após alterações na branch `main`. A validação automatizada está em `.github/workflows/validate.yml`.
+O workflow está em `.github/workflows/validate.yml` e reúne validação e publicação:
+
+1. Em pull requests direcionadas à branch `main`, executa os testes, a verificação de tipos e o build.
+2. Em alterações enviadas à `main`, executa essas mesmas verificações com Node.js 22 e 24.
+3. A publicação no GitHub Pages só é iniciada depois que a validação termina com sucesso. O job de publicação utiliza Node.js 24.
+4. Também é possível iniciar o workflow manualmente pela aba **Actions** do GitHub; a publicação ocorre quando a execução é iniciada na branch `main`.
+
+Assim, uma falha na validação impede a etapa de publicação.
