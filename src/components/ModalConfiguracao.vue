@@ -47,11 +47,11 @@
             <div>
               <label class="block text-xs font-bold text-text opacity-40 uppercase mb-1">Trabalho (Dias)</label>
               <input
-                type="number"
-                v-model="novaEscalaDiasTrabalho"
-                min="1"
-                step="1"
+                type="text"
                 inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="off"
+                :value="novaEscalaDiasTrabalho"
                 @keydown="bloquearEntradaNaoInteira"
                 @paste="bloquearColagemNaoInteira"
                 @input="sanitizarEntrada('trabalho', $event)"
@@ -61,11 +61,11 @@
             <div>
               <label class="block text-xs font-bold text-text opacity-40 uppercase mb-1">Folga (Dias)</label>
               <input
-                type="number"
-                v-model="novaEscalaDiasFolga"
-                min="1"
-                step="1"
+                type="text"
                 inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="off"
+                :value="novaEscalaDiasFolga"
                 @keydown="bloquearEntradaNaoInteira"
                 @paste="bloquearColagemNaoInteira"
                 @input="sanitizarEntrada('folga', $event)"
@@ -73,9 +73,6 @@
               >
             </div>
           </div>
-          <p v-if="mensagemErroEscala" class="text-sm text-red-500" role="alert">
-            {{ mensagemErroEscala }}
-          </p>
           <div class="flex justify-end">
             <button
               @click="adicionarNovaEscala"
@@ -141,11 +138,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal próprio para informar entradas inválidas -->
+    <div
+      v-if="mostrarModalErroEscala"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-erro-escala"
+    >
+      <div class="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <h3 id="titulo-erro-escala" class="mb-3 text-lg font-bold text-text">Entrada inválida</h3>
+        <p class="mb-6 text-sm text-text">{{ mensagemErroEscala }}</p>
+        <div class="flex justify-end">
+          <button
+            type="button"
+            class="rounded-xl bg-primary px-6 py-2 font-bold text-white hover:opacity-90"
+            @click="fecharModalErroEscala"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { nextTick, ref, watchEffect } from 'vue'
 import BaseButton from './BaseButton.vue'
 import { useScheduleStore } from '../stores/schedule'
 
@@ -165,9 +185,13 @@ const dataInicialLocal = ref(
     ? new Date(props.dataInicial).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10)
 )
-const novaEscalaDiasTrabalho = ref(1)
-const novaEscalaDiasFolga = ref(1)
+const novaEscalaDiasTrabalho = ref('1')
+const novaEscalaDiasFolga = ref('1')
+const ultimoValorValidoTrabalho = ref('1')
+const ultimoValorValidoFolga = ref('1')
 const mensagemErroEscala = ref('')
+const mostrarModalErroEscala = ref(false)
+const campoComErro = ref<HTMLInputElement | null>(null)
 const escalaParaRemover = ref('')
 
 // Atualizar escala e data inicial sempre que props mudar
@@ -177,6 +201,26 @@ watchEffect(() => {
     ? new Date(props.dataInicial).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10)
 })
+
+// Exibir mensagem no modal do próprio aplicativo e lembrar o campo que precisa de correção.
+function exibirErroEscala(input?: HTMLInputElement) {
+  mensagemErroEscala.value = 'Não são aceitos números decimais. Informe apenas números inteiros positivos para criar sua escala.'
+  campoComErro.value = input ?? null
+  mostrarModalErroEscala.value = true
+}
+
+function fecharModalErroEscala() {
+  mostrarModalErroEscala.value = false
+  const campo = campoComErro.value
+  campoComErro.value = null
+
+  if (campo) {
+    nextTick(() => {
+      campo.focus()
+      campo.select()
+    })
+  }
+}
 
 // Impedir a digitação de caracteres que permitam valores não inteiros.
 function bloquearEntradaNaoInteira(event: KeyboardEvent) {
@@ -192,6 +236,7 @@ function bloquearEntradaNaoInteira(event: KeyboardEvent) {
 
   if (!/^\d$/.test(event.key)) {
     event.preventDefault()
+    exibirErroEscala(event.currentTarget as HTMLInputElement)
   }
 }
 
@@ -201,23 +246,30 @@ function bloquearColagemNaoInteira(event: ClipboardEvent) {
 
   if (!/^\d+$/.test(valorColado.trim())) {
     event.preventDefault()
-    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
+    exibirErroEscala(event.currentTarget as HTMLInputElement)
   }
 }
 
-// Sanitizar qualquer entrada (IME, mobile, autocomplete) que contenha caracteres não inteiros
+// Fallback para entradas de dispositivos móveis, IME e métodos que não disparem keydown.
 function sanitizarEntrada(campo: 'trabalho' | 'folga', event: Event) {
-  mensagemErroEscala.value = ''
   const input = event.target as HTMLInputElement
-  if (input.value && !/^\d+$/.test(input.value)) {
-    const valorLimpo = input.value.replace(/\D/g, '')
-    input.value = valorLimpo
-    if (campo === 'trabalho') {
-      novaEscalaDiasTrabalho.value = valorLimpo ? Number(valorLimpo) : 1
-    } else {
-      novaEscalaDiasFolga.value = valorLimpo ? Number(valorLimpo) : 1
-    }
-    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
+  const valor = input.value
+  const ultimoValorValido = campo === 'trabalho'
+    ? ultimoValorValidoTrabalho.value
+    : ultimoValorValidoFolga.value
+
+  if (valor !== '' && (!/^\d+$/.test(valor) || !Number.isSafeInteger(Number(valor)))) {
+    input.value = ultimoValorValido
+    exibirErroEscala(input)
+    return
+  }
+
+  if (campo === 'trabalho') {
+    novaEscalaDiasTrabalho.value = valor
+    ultimoValorValidoTrabalho.value = valor
+  } else {
+    novaEscalaDiasFolga.value = valor
+    ultimoValorValidoFolga.value = valor
   }
 }
 
@@ -232,7 +284,7 @@ function adicionarNovaEscala() {
     trabalho < 1 ||
     folga < 1
   ) {
-    mensagemErroEscala.value = 'Digite apenas números inteiros positivos.'
+    exibirErroEscala()
     return
   }
 
