@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { VitePWA } from 'vite-plugin-pwa'
+import { VitePWA } from '@unplugin-pwa/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,13 +9,12 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.svg', 'icons/*.png'],
       strategies: 'generateSW',
       injectRegister: 'auto',
       devOptions: {
         enabled: true
       },
-      workbox: {
+      generateSW: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
