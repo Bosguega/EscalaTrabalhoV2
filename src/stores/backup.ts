@@ -193,6 +193,49 @@ export const useBackupStore = defineStore('backup', () => {
     }
   }
 
+  async function removerBackup(timestamp: number): Promise<boolean> {
+    await inicializacaoPromise
+    const indice = backups.value.findIndex(
+      item => item.metadata.timestamp === timestamp
+    )
+    if (indice === -1) return false
+
+    const backupsAnteriores = backups.value
+    backups.value = backups.value.filter(
+      item => item.metadata.timestamp !== timestamp
+    )
+
+    try {
+      await salvarBackups()
+      atualizarUltimoBackup()
+      return true
+    } catch (error) {
+      backups.value = backupsAnteriores
+      atualizarUltimoBackup()
+      console.error('Erro ao excluir backup:', error)
+      return false
+    }
+  }
+
+  async function removerTodosBackups(): Promise<boolean> {
+    await inicializacaoPromise
+    if (backups.value.length === 0) return true
+
+    const backupsAnteriores = backups.value
+    backups.value = []
+
+    try {
+      await salvarBackups()
+      atualizarUltimoBackup()
+      return true
+    } catch (error) {
+      backups.value = backupsAnteriores
+      atualizarUltimoBackup()
+      console.error('Erro ao excluir todos os backups:', error)
+      return false
+    }
+  }
+
   async function exportarDados(): Promise<string> {
     await inicializacaoPromise
     const dados = await carregarDados()
@@ -383,6 +426,8 @@ export const useBackupStore = defineStore('backup', () => {
     intervaloBackup,
     criarBackup,
     restaurarBackup,
+    removerBackup,
+    removerTodosBackups,
     exportarDados,
     importarDados,
     limparBackupsAntigos
