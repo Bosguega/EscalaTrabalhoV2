@@ -20,10 +20,12 @@
         </div>
         <div>
           <h2 class="text-2xl font-bold text-text tracking-tight">Gerenciamento</h2>
-          <p class="text-sm text-text opacity-60 mt-1">Sincronize ou proteja seus dados</p>
+          <p class="text-sm text-text opacity-60 mt-1">Proteja seus dados neste dispositivo</p>
         </div>
       </div>
       
+      <p class="text-xs text-text opacity-60 -mt-5 mb-6">Os backups automáticos ficam armazenados neste navegador. Para guardar uma cópia fora dele ou transferir seus dados, use <strong>Salvar Arquivo</strong>.</p>
+
       <!-- Status do Backup -->
       <div class="mb-8 p-5 bg-card border border-border shadow-sm rounded-2xl relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
@@ -91,7 +93,16 @@
 
       <!-- Lista de Backups -->
       <div>
-        <h3 class="text-xs font-bold text-text opacity-40 uppercase tracking-widest mb-4">Pontos de Restauração</h3>
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <h3 class="text-xs font-bold text-text opacity-40 uppercase tracking-widest">Pontos de Restauração</h3>
+          <button
+            v-if="backupsOrdenados.length > 0"
+            @click="removerTodosBackups"
+            class="text-xs font-bold text-folga hover:underline disabled:opacity-50"
+          >
+            Excluir todos
+          </button>
+        </div>
         <div v-if="backupsOrdenados.length === 0" class="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-3xl opacity-60">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
           <p class="text-sm font-bold">Nenhum backup disponível</p>
@@ -117,12 +128,24 @@
                 </p>
               </div>
             </div>
-            <button
-              @click="restaurarBackup(backup.metadata.timestamp)"
-              class="px-5 py-2 text-xs font-bold bg-primary text-white rounded-xl hover:opacity-90 transition-all active:scale-95 shadow-md hover:shadow-lg"
-            >
-              Aplicar
-            </button>
+            <div class="flex items-center gap-2">
+              <button
+                @click="restaurarBackup(backup.metadata.timestamp)"
+                class="px-4 py-2 text-xs font-bold bg-primary text-white rounded-xl hover:opacity-90 transition-all active:scale-95 shadow-md"
+              >
+                Aplicar
+              </button>
+              <button
+                @click="removerBackup(backup.metadata.timestamp)"
+                class="p-2 text-folga hover:bg-folga/10 rounded-xl transition-colors"
+                :aria-label="`Excluir backup de ${formatarData(backup.metadata.timestamp)}`"
+                title="Excluir backup"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -167,11 +190,42 @@ async function criarBackupManual() {
 }
 
 async function restaurarBackup(timestamp: number) {
+  const backup = backupStore.backups.find(
+    item => item.metadata.timestamp === timestamp
+  )
+  if (!backup) return
+
+  const data = formatarData(timestamp)
+  const confirmar = window.confirm(
+    `Restaurar o backup de ${data}?\n\nOs dados atuais do aplicativo serão substituídos pelos dados dessa cópia.\n\nAntes de continuar, certifique-se de que possui uma cópia recente dos dados atuais.`
+  )
+  if (!confirmar) return
+
   if (await backupStore.restaurarBackup(timestamp)) {
     alert('Backup restaurado com sucesso!')
     window.location.reload()
   } else {
-    alert('Erro ao restaurar backup')
+    alert('Não foi possível restaurar o backup. Os dados atuais foram mantidos sempre que possível.')
+  }
+}
+
+async function removerBackup(timestamp: number) {
+  const data = formatarData(timestamp)
+  if (!window.confirm(`Excluir permanentemente o backup de ${data}?\n\nEssa ação não altera os dados atuais do aplicativo.`)) return
+
+  if (!(await backupStore.removerBackup(timestamp))) {
+    alert('Não foi possível excluir o backup. Tente novamente.')
+  }
+}
+
+async function removerTodosBackups() {
+  const quantidade = backupStore.backups.length
+  if (quantidade === 0) return
+
+  if (!window.confirm(`Excluir permanentemente todos os ${quantidade} backups armazenados neste dispositivo?\n\nEssa ação não altera os dados atuais do aplicativo e não pode ser desfeita.`)) return
+
+  if (!(await backupStore.removerTodosBackups())) {
+    alert('Não foi possível excluir os backups. Tente novamente.')
   }
 }
 
