@@ -22,8 +22,8 @@
     >
       <!-- Dias do mês -->
       <transition
-        :enter-active-class="animationStore.selectedAnimation.enter"
-        :leave-active-class="animationStore.selectedAnimation.leave"
+        :enter-active-class="enterAnimationClass"
+        :leave-active-class="leaveAnimationClass"
         mode="out-in"
       >
         <div
@@ -34,7 +34,6 @@
             v-for="(dia, index) in diasDoMes"
             :key="`${mes}-${index}`"
             class="aspect-square flex items-center justify-center text-base font-medium rounded-xl relative cursor-pointer border transition-all duration-200"
-            :class="[`animate__delay-${Math.min(index % 7, 5)}0ms`]"
             :style="{
               borderColor: dia.ativo
                 ? scheduleStore.isDiaTrabalho(new Date(ano, mes, Number(dia.numero)), props.dataInicial, props.escala)
@@ -129,7 +128,35 @@ function atualizarDiasDoMes() {
   diasDoMes.value = diasFormatados
 }
 
-watch(() => props.data, async () => {
+const transitionDirection = ref<'next' | 'previous'>('next')
+
+const enterAnimationClass = computed(() => {
+  if (animationStore.selectedAnimation.id !== 'slide-horizontal') {
+    return animationStore.selectedAnimation.enter
+  }
+
+  return transitionDirection.value === 'next'
+    ? 'animate__animated animate__slideInRight'
+    : 'animate__animated animate__slideInLeft'
+})
+
+const leaveAnimationClass = computed(() => {
+  if (animationStore.selectedAnimation.id !== 'slide-horizontal') {
+    return animationStore.selectedAnimation.leave
+  }
+
+  return transitionDirection.value === 'next'
+    ? 'animate__animated animate__slideOutLeft'
+    : 'animate__animated animate__slideOutRight'
+})
+
+watch(() => props.data, (novaData, dataAnterior) => {
+  if (dataAnterior) {
+    transitionDirection.value = novaData.getTime() >= dataAnterior.getTime()
+      ? 'next'
+      : 'previous'
+  }
+
   atualizarDiasDoMes()
 }, { immediate: true })
 

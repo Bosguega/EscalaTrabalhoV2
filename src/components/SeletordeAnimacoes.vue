@@ -75,8 +75,3 @@ function previewAnimation() {
 }
 
 </script>
-
-<style>
-/* Importar Animate.css para as animações */
-@import 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
-</style>
