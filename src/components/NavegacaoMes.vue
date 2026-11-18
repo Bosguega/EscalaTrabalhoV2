@@ -15,8 +15,8 @@
     
         <!-- Texto do mês com animação -->
         <transition
-          :enter-active-class="animationStore.selectedAnimation.enter"
-          :leave-active-class="animationStore.selectedAnimation.leave"
+          :enter-active-class="enterAnimationClass"
+          :leave-active-class="leaveAnimationClass"
           mode="out-in"
         >
           <span 
@@ -43,12 +43,38 @@
   </template>
   
   <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useAnimationStore } from '../stores/animation'
   import { ajustarMes } from '../utils/calendarioUtils'
   
   const animationStore = useAnimationStore()
   const props = defineProps<{ data: Date }>()
+
+  const transitionDirection = ref<'next' | 'previous'>('next')
+
+  const enterAnimationClass = computed(() => {
+    if (animationStore.selectedAnimation.id !== 'slide-horizontal') {
+      return animationStore.selectedAnimation.enter
+    }
+
+    return transitionDirection.value === 'next'
+      ? 'animate__animated animate__slideInRight'
+      : 'animate__animated animate__slideInLeft'
+  })
+
+  const leaveAnimationClass = computed(() => {
+    if (animationStore.selectedAnimation.id !== 'slide-horizontal') {
+      return animationStore.selectedAnimation.leave
+    }
+
+    return transitionDirection.value === 'next'
+      ? 'animate__animated animate__slideOutLeft'
+      : 'animate__animated animate__slideOutRight'
+  })
+
+  watch(() => props.data.getTime(), (novoTimestamp, timestampAnterior) => {
+    transitionDirection.value = novoTimestamp >= timestampAnterior ? 'next' : 'previous'
+  })
   const emit = defineEmits<{
     (e: 'update:data', value: Date): void
   }>()
