@@ -136,6 +136,56 @@ describe('useBackupStore', () => {
     expect(salvarDados).not.toHaveBeenCalled()
   })
 
+  it('exclui um backup específico sem alterar os dados atuais e atualiza o último backup', async () => {
+    const backupMaisRecente = { ...backupValido, metadata: { ...backupValido.metadata, timestamp: 456 } }
+    vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
+      if (chave === 'backups') return [backupMaisRecente, backupValido]
+      return null
+    })
+
+    const store = useBackupStore()
+    const resultado = await store.removerBackup(123)
+
+    expect(resultado).toBe(true)
+    expect(store.backups).toEqual([backupMaisRecente])
+    expect(store.ultimoBackup?.getTime()).toBe(456)
+    expect(localforage.setItem).toHaveBeenCalledWith('backups', [backupMaisRecente])
+    expect(salvarDados).not.toHaveBeenCalled()
+  })
+
+  it('permite excluir todos os backups sem alterar os dados atuais', async () => {
+    vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
+      if (chave === 'backups') return [backupValido]
+      return null
+    })
+
+    const store = useBackupStore()
+    const resultado = await store.removerTodosBackups()
+
+    expect(resultado).toBe(true)
+    expect(store.backups).toEqual([])
+    expect(store.ultimoBackup).toBeNull()
+    expect(localforage.setItem).toHaveBeenCalledWith('backups', [])
+    expect(salvarDados).not.toHaveBeenCalled()
+  })
+
+  it('restaura a lista anterior quando a persistência da exclusão falha', async () => {
+    vi.mocked(localforage.getItem).mockImplementation(async (chave: string) => {
+      if (chave === 'backups') return [backupValido]
+      return null
+    })
+    vi.mocked(localforage.setItem).mockRejectedValueOnce(new Error('falha ao persistir'))
+    const erroConsole = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const store = useBackupStore()
+    const resultado = await store.removerBackup(123)
+
+    expect(resultado).toBe(false)
+    expect(store.backups).toEqual([backupValido])
+    expect(store.ultimoBackup?.getTime()).toBe(123)
+    expect(erroConsole).toHaveBeenCalled()
+  })
+
   it('rejeita arquivo de importação inválido sem gravar os dados', async () => {
     const store = useBackupStore()
 
