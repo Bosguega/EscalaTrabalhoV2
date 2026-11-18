@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import 'animate.css/animate.min.css'
 import { useAnimationStore } from '../stores/animation'
 
 const animationStore = useAnimationStore()
@@ -75,8 +76,3 @@ function previewAnimation() {
 }
 
 </script>
-
-<style>
-/* Importar Animate.css para as animações */
-@import 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
-</style>
