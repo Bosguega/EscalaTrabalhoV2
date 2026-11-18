@@ -45,7 +45,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import 'animate.css/animate.min.css'
 import { useAnimationStore } from '../stores/animation'
 
 const animationStore = useAnimationStore()
